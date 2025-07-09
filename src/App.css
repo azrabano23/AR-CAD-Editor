@@ -1,4 +1,4 @@
-/* Modern White/Green Theme Overhaul */
+/* Dark Mode with Green Accents */
 * {
   margin: 0;
   padding: 0;
@@ -10,18 +10,18 @@ html {
 }
 
 body {
-  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background: #f8fafc;
-  color: #222;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #0a0a0a;
+  color: #e5e5e5;
   line-height: 1.6;
   font-size: 16px;
   min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
-  color: #111;
+  color: #ffffff;
   letter-spacing: -0.02em;
 }
 
@@ -35,41 +35,70 @@ h3 {
   font-size: 1.5rem;
 }
 p {
-  color: #4b5563;
-  font-size: 1.1rem;
+  color: #a1a1aa;
+  font-size: 1rem;
   line-height: 1.7;
   max-width: 65ch;
 }
 a {
-  color: #10b981;
+  color: #22c55e;
   text-decoration: none;
   transition: color 0.2s;
 }
 a:hover {
-  color: #059669;
+  color: #16a34a;
 }
 button {
+  background-color: #007f5f;
+  color: #e6e6e6;
   border: none;
+  padding: 12px 24px;
+  margin: 4px 2px;
   cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s;
+  transition: background-color 0.3s;
   border-radius: 12px;
   font-weight: 700;
   outline: none;
+  font-family: inherit;
 }
 
-/* Navbar - Glassmorphism */
+button:hover {
+  background-color: #005f47;
+}
+
+.upload-zone {
+  border: 2px dashed #007f5f;
+  padding: 50px;
+  text-align: center;
+  cursor: pointer;
+  margin: 20px;
+  color: #e6e6e6;
+}
+
+.file-item {
+  background-color: #262626;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.navbar, .footer {
+  background-color: #111;
+  padding: 10px;
+}
+
+/* Navbar - Dark Mode */
 .navbar {
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255,255,255,0.85);
+  background: rgba(10,10,10,0.95);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #22c55e;
   z-index: 1000;
   padding: 1rem 0;
-  box-shadow: 0 2px 16px rgba(16,185,129,0.04);
+  box-shadow: 0 2px 16px rgba(34,197,94,0.2);
 }
 .nav-container {
   max-width: 1200px;

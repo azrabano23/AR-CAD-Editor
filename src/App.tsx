@@ -170,8 +170,17 @@ function App() {
 
   const openARViewer = (file: UploadedFile) => {
     if (file.status === 'converted' && file.convertedUrl) {
-      // In a real implementation, this would open the MetaQuest AR viewer
-      alert(`Opening ${file.name} in AR Viewer for MetaQuest...\nFile ready for AR visualization!`);
+      // Open Unity WebGL viewer in a new window
+      const unityUrl = `/unity-builds/webgl/index.html?model=${encodeURIComponent(file.convertedUrl)}`;
+      window.open(unityUrl, '_blank', 'width=1200,height=800');
+    }
+  };
+
+  const openWebGLViewer = (file: UploadedFile) => {
+    if (file.status === 'converted' && file.convertedUrl) {
+      // Open Unity WebGL viewer in a new window
+      const unityUrl = `/unity-builds/webgl/index.html?model=${encodeURIComponent(file.convertedUrl)}`;
+      window.open(unityUrl, '_blank', 'width=1200,height=800');
     }
   };
 
@@ -228,10 +237,10 @@ function App() {
         <div className="hero-container">
           <div className="hero-content">
             <h1 className="hero-title">HoloDraft</h1>
-            <p className="hero-subtitle">The Future of CAD Design in Augmented Reality</p>
+            <p className="hero-subtitle">Enterprise CAD-to-AR Platform</p>
             <p className="hero-description">
-              Transform your CAD files into immersive AR experiences. Design, visualize, and edit 3D models 
-              directly in augmented reality using MetaQuest technology.
+              Revolutionary platform converting CAD files to immersive AR experiences. 
+              Streamlined pipeline from design files to MetaQuest deployment with WebGL preview capability.
             </p>
             <div className="hero-actions">
               <button className="btn-primary">Start Converting</button>
@@ -358,12 +367,20 @@ function App() {
                       </button>
                     )}
                     {file.status === 'converted' && (
-                      <button 
-                        className="action-btn ar-btn"
-                        onClick={() => openARViewer(file)}
-                      >
-                        🥽 View in AR
-                      </button>
+                      <>
+                        <button 
+                          className="action-btn webgl-btn"
+                          onClick={() => openWebGLViewer(file)}
+                        >
+                          🌐 View in WebGL
+                        </button>
+                        <button 
+                          className="action-btn ar-btn"
+                          onClick={() => openARViewer(file)}
+                        >
+                          🥽 View in AR
+                        </button>
+                      </>
                     )}
                     {file.status === 'converting' && (
                       <div className="converting-spinner">Converting...</div>
@@ -423,6 +440,45 @@ function App() {
                   <h3>AR Experience</h3>
                   <p>View and edit your models in immersive AR on MetaQuest</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tech Requirements */}
+        <section className="tech-requirements">
+          <div className="container">
+            <h2>💻 Development Requirements</h2>
+            <div className="requirements-grid">
+              <div className="requirement-card">
+                <div className="req-icon">🔧</div>
+                <h3>Development Tools</h3>
+                <ul>
+                  <li><strong>IDE:</strong> VS Code (recommended)</li>
+                  <li><strong>Unity:</strong> 2022.3.0f1 or higher</li>
+                  <li><strong>Node.js:</strong> v18+ for backend</li>
+                  <li><strong>Python:</strong> 3.8+ for Blender integration</li>
+                  <li><strong>Blender:</strong> 3.0+ for file conversion</li>
+                </ul>
+              </div>
+              <div className="requirement-card">
+                <div className="req-icon">📦</div>
+                <h3>File Processing Pipeline</h3>
+                <ol>
+                  <li><strong>Upload:</strong> Files stored in Supabase storage</li>
+                  <li><strong>Processing:</strong> Blender API converts to FBX</li>
+                  <li><strong>WebGL:</strong> Unity builds for web preview</li>
+                  <li><strong>AR Deploy:</strong> MetaQuest APK generation</li>
+                </ol>
+              </div>
+              <div className="requirement-card">
+                <div className="req-icon">🌐</div>
+                <h3>What is WebGL?</h3>
+                <p>
+                  <strong>WebGL (Web Graphics Library)</strong> enables 3D graphics in web browsers without plugins. 
+                  Our Unity WebGL build allows users to view and interact with CAD models directly in their browser 
+                  before deploying to AR devices.
+                </p>
               </div>
             </div>
           </div>

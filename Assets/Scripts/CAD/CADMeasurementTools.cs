@@ -425,7 +425,8 @@ namespace HoloDraft.CAD
             
             LineRenderer arcLine = arcObject.AddComponent<LineRenderer>();
             arcLine.material = new Material(Shader.Find("Sprites/Default"));
-            arcLine.color = arcColor;
+            arcLine.startColor = arcColor;
+            arcLine.endColor = arcColor;
             arcLine.startWidth = 0.01f;
             arcLine.endWidth = 0.01f;
             arcLine.positionCount = segments + 1;
@@ -458,7 +459,8 @@ namespace HoloDraft.CAD
                 {
                     if (line != null)
                     {
-                        line.color = arcColor;
+                        line.startColor = arcColor;
+                        line.endColor = arcColor;
                     }
                 }
             }

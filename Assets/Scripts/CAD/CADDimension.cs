@@ -32,7 +32,8 @@ namespace HoloDraft.CAD
         {
             lineRenderer = gameObject.AddComponent<LineRenderer>();
             lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            lineRenderer.color = lineColor;
+            lineRenderer.startColor = lineColor;
+            lineRenderer.endColor = lineColor;
             lineRenderer.startWidth = lineWidth;
             lineRenderer.endWidth = lineWidth;
             lineRenderer.positionCount = 2;
@@ -107,7 +108,8 @@ namespace HoloDraft.CAD
             lineColor = color;
             if (lineRenderer != null)
             {
-                lineRenderer.color = color;
+                lineRenderer.startColor = color;
+                lineRenderer.endColor = color;
             }
         }
         

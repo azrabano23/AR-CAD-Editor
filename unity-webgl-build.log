@@ -1,0 +1,55 @@
+Unity Editor version:    2022.3.0f1 (fb119bb0b476)
+Branch:                  2022.3/release
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 15.5 (Build 24F74)
+Darwin version:          24.5.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        8192 MB
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to the License Client on channel: "LicenseClient-azrabano"
+[Licensing::Client] Error: Code 10 while verifying Licensing Client signature (process Id: 1212, path: "/Applications/Unity Hub.app/Contents/Frameworks/UnityLicensingClient_V1.app/Contents/MacOS/Unity.Licensing.Client")
+[Licensing::Module] Error: LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.17.0+aa6cfba
+  Session Id:              463ae6546cdd4930a0153b9c69b5b7cb
+  Correlation Id:          f11ad7df6db86f1d2ed9e5ab7d33fb87
+  External correlation Id: 5246329190331788802
+  Machine Id:              pbpzNG3AFPvKgMXzA4vlpRTI/CI=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-azrabano" (connect: 0.00s, validation: 0.02s, handshake: 0.34s)
+[Licensing::IpcConnector] Successfully connected to the License Notification on channel: "LicenseClient-azrabano-notifications"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully updated license
+[Licensing::Client] Successfully resolved entitlements
+[Licensing::Module] Serial number assigned to: "2475842769562-UnityPersXXXX"
+Pro License: NO
+Launching external process: /Applications/Unity/Hub/Editor/2022.3.0f1/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/2022.3.0f1/Unity.app/Contents/MacOS/Unity
+-batchmode
+-quit
+-projectPath
+/Users/azrabano/cad-editor-react-website
+-buildTarget
+WebGL
+-buildPath
+/Users/azrabano/cad-editor-react-website/public/unity-builds/webgl
+-logFile
+/Users/azrabano/cad-editor-react-website/unity-webgl-build.log
+-executeMethod
+WebGLBuilder.BuildWebGL
+Successfully changed project path to: /Users/azrabano/cad-editor-react-website
+/Users/azrabano/cad-editor-react-website
+It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: /Users/azrabano/cad-editor-react-website
+Fatal Error! It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: /Users/azrabano/cad-editor-react-website
+[Package Manager] Server::Kill -- Server was shutdown

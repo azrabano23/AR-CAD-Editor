@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Microsoft.MixedReality.Toolkit.Utilities;
-using Microsoft.MixedReality.Toolkit.Input;
+// MRTK dependencies removed for WebGL build
 
 namespace HoloDraft.CAD
 {
@@ -169,16 +168,21 @@ namespace HoloDraft.CAD
                 collider.center = bounds.center;
             }
             
-            // Add MRTK interaction components
-            var manipHandler = modelObject.AddComponent<Microsoft.MixedReality.Toolkit.UI.ObjectManipulator>();
-            manipHandler.HostTransform = modelObject.transform;
-            manipHandler.SmoothingFar = false;
-            manipHandler.SmoothingNear = false;
+            // Add basic interaction components (MRTK removed for WebGL)
+            // Basic mouse/touch interaction can be added here if needed
             
             // Add CAD-specific interaction
             modelObject.AddComponent<CADModelInteraction>();
         }
         
+        private void ConfigureCADVisualization(CADModel cadModel)
+        {
+            // Placeholder for actual CAD visualization logic
+            Debug.Log($"Configuring CAD Visualization for model: {cadModel.ModelId}");
+            // Apply CAD visualization settings if required
+            // For example, configure shading, camera angles, etc.
+        }
+
         #endregion
         
         #region CAD Visualization Features

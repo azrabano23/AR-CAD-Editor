@@ -1,15 +1,11 @@
 using UnityEngine;
-using Microsoft.MixedReality.Toolkit.Input;
 
 namespace HoloDraft.CAD
 {
     /// <summary>
-    /// CAD Model Interaction for handling hand gestures and input
+    /// CAD Model Interaction for handling mouse and touch input (MRTK removed for WebGL)
     /// </summary>
-    public class CADModelInteraction : MonoBehaviour, 
-        IMixedRealityPointerHandler, 
-        IMixedRealityFocusHandler,
-        IMixedRealityInputHandler<float>
+    public class CADModelInteraction : MonoBehaviour
     {
         [Header("Interaction Settings")]
         [SerializeField] private bool enableSelection = true;
@@ -51,9 +47,49 @@ namespace HoloDraft.CAD
             }
         }
         
-        #region IMixedRealityPointerHandler
+        private void Update()
+        {
+            HandleMouseInput();
+        }
         
-        public void OnPointerDown(MixedRealityPointerEventData eventData)
+        private void HandleMouseInput()
+        {
+            // Handle mouse clicks for WebGL
+            if (Input.GetMouseButtonDown(0))
+            {
+                OnPointerDown();
+            }
+            
+            if (Input.GetMouseButtonUp(0))
+            {
+                OnPointerUp();
+            }
+            
+            // Handle mouse hover
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider.gameObject == gameObject)
+                {
+                    if (!isFocused)
+                    {
+                        OnFocusEnter();
+                    }
+                }
+                else if (isFocused)
+                {
+                    OnFocusExit();
+                }
+            }
+            else if (isFocused)
+            {
+                OnFocusExit();
+            }
+        }
+        
+        private void OnPointerDown()
         {
             if (!enableSelection) return;
             
@@ -68,34 +104,23 @@ namespace HoloDraft.CAD
             // Handle measurement mode
             if (isMeasuring)
             {
-                HandleMeasurementClick(eventData.Pointer.Result.Details.Point);
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
+                {
+                    HandleMeasurementClick(hit.point);
+                }
             }
+            
+            Debug.Log($"CAD Model clicked: {cadModel?.ModelId}");
         }
         
-        public void OnPointerUp(MixedRealityPointerEventData eventData)
+        private void OnPointerUp()
         {
             isPointerDown = false;
         }
         
-        public void OnPointerClicked(MixedRealityPointerEventData eventData)
-        {
-            // Handle click events
-            Debug.Log($"CAD Model clicked: {cadModel?.ModelId}");
-        }
-        
-        public void OnPointerDragged(MixedRealityPointerEventData eventData)
-        {
-            if (!enableManipulation) return;
-            
-            // Handle dragging for manipulation
-            // This is handled by the ObjectManipulator component
-        }
-        
-        #endregion
-        
-        #region IMixedRealityFocusHandler
-        
-        public void OnFocusEnter(FocusEventData eventData)
+        private void OnFocusEnter()
         {
             isFocused = true;
             
@@ -107,7 +132,7 @@ namespace HoloDraft.CAD
             }
         }
         
-        public void OnFocusExit(FocusEventData eventData)
+        private void OnFocusExit()
         {
             isFocused = false;
             
@@ -118,27 +143,6 @@ namespace HoloDraft.CAD
                 RemoveHighlightMaterial();
             }
         }
-        
-        #endregion
-        
-        #region IMixedRealityInputHandler<float>
-        
-        public void OnInputUp(InputEventData<float> eventData)
-        {
-            // Handle input up events (e.g., trigger release)
-        }
-        
-        public void OnInputDown(InputEventData<float> eventData)
-        {
-            // Handle input down events (e.g., trigger press)
-        }
-        
-        public void OnInputChanged(InputEventData<float> eventData)
-        {
-            // Handle input changes (e.g., trigger pressure)
-        }
-        
-        #endregion
         
         #region Measurement System
         
