@@ -1,7 +1,14 @@
 import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, File, Eye, Smartphone, Cpu, Database, Zap, ArrowRight, X, PlayCircle, Github, ExternalLink } from 'lucide-react';
 import './App.css';
 import SupabaseTest from './components/SupabaseTest';
 import UnityCADViewer from './components/UnityCADViewer';
+import WebGLViewer from './components/WebGLViewer';
+import ARViewer from './components/ARViewer';
+import ModernUploadZone from './components/ModernUploadZone';
+import ModernFileCard from './components/ModernFileCard';
+import ModernButton from './components/ModernButton';
 
 interface UploadedFile {
   name: string;
@@ -22,6 +29,9 @@ interface UploadedFile {
 function App() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [showWebGLViewer, setShowWebGLViewer] = useState(false);
+  const [showARViewer, setShowARViewer] = useState(false);
+  const [currentModelUrl, setCurrentModelUrl] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = ['stl', 'step', 'obj', 'ply', 'dae'];
@@ -170,18 +180,22 @@ function App() {
 
   const openARViewer = (file: UploadedFile) => {
     if (file.status === 'converted' && file.convertedUrl) {
-      // Open Unity WebGL viewer in a new window
-      const unityUrl = `/unity-builds/webgl/index.html?model=${encodeURIComponent(file.convertedUrl)}`;
-      window.open(unityUrl, '_blank', 'width=1200,height=800');
+      setCurrentModelUrl(file.convertedUrl);
+      setShowARViewer(true);
     }
   };
 
   const openWebGLViewer = (file: UploadedFile) => {
     if (file.status === 'converted' && file.convertedUrl) {
-      // Open Unity WebGL viewer in a new window
-      const unityUrl = `/unity-builds/webgl/index.html?model=${encodeURIComponent(file.convertedUrl)}`;
-      window.open(unityUrl, '_blank', 'width=1200,height=800');
+      setCurrentModelUrl(file.convertedUrl);
+      setShowWebGLViewer(true);
     }
+  };
+
+  const closeViewers = () => {
+    setShowWebGLViewer(false);
+    setShowARViewer(false);
+    setCurrentModelUrl(undefined);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -242,10 +256,27 @@ function App() {
               Revolutionary platform converting CAD files to immersive AR experiences. 
               Streamlined pipeline from design files to MetaQuest deployment with WebGL preview capability.
             </p>
-            <div className="hero-actions">
-              <button className="btn-primary">Start Converting</button>
-              <button className="btn-secondary">Watch Demo</button>
-            </div>
+            <motion.div 
+              className="hero-actions"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              <ModernButton 
+                variant="primary" 
+                size="lg"
+                icon={<PlayCircle className="w-5 h-5" />}
+              >
+                Start Converting
+              </ModernButton>
+              <ModernButton 
+                variant="secondary" 
+                size="lg"
+                icon={<Eye className="w-5 h-5" />}
+              >
+                Watch Demo
+              </ModernButton>
+            </motion.div>
             <div className="hero-stats">
               <div className="stat">
                 <span className="stat-number">5+</span>
@@ -311,85 +342,62 @@ function App() {
         {/* Upload Section */}
         <section className="upload-section">
           <div className="container">
-            <h2>Upload Your CAD Files</h2>
-            <div 
-              className={`upload-zone ${dragActive ? 'drag-active' : ''}`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12 text-4xl font-bold text-green-500"
             >
-              <div className="upload-content">
-                <div className="upload-icon">📁</div>
-                <h3>Drop CAD files here or click to browse</h3>
-                <p>Supported formats: {supportedFormats.join(', ').toUpperCase()}</p>
-                <p>Maximum file size: 50MB</p>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
+              Upload Your CAD Files
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <ModernUploadZone
+                onDrop={handleFiles}
                 accept={supportedFormats.map(f => `.${f}`).join(',')}
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
+                supportedFormats={supportedFormats}
+                maxSize={maxFileSize}
               />
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {files.length > 0 && (
-          <div className="files-section">
-            <h2>📋 Uploaded Files</h2>
-            <div className="files-list">
-              {files.map((file, index) => (
-                <div key={index} className="file-item">
-                  <div className="file-info">
-                    <div className="file-icon">{getStatusIcon(file.status)}</div>
-                    <div className="file-details">
-                      <h4>{file.name}</h4>
-                      <p>{formatFileSize(file.size)} • {file.originalFormat.toUpperCase()}</p>
-                      <p className={`status status-${file.status}`}>
-                        {getStatusText(file.status)}
-                      </p>
-                      {file.errorMessage && (
-                        <p className="error-message">{file.errorMessage}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="file-actions">
-                    {file.status === 'uploaded' && (
-                      <button 
-                        className="action-btn convert-btn"
-                        onClick={() => convertToFBX(file)}
-                      >
-                        🔄 Convert to FBX
-                      </button>
-                    )}
-                    {file.status === 'converted' && (
-                      <>
-                        <button 
-                          className="action-btn webgl-btn"
-                          onClick={() => openWebGLViewer(file)}
-                        >
-                          🌐 View in WebGL
-                        </button>
-                        <button 
-                          className="action-btn ar-btn"
-                          onClick={() => openARViewer(file)}
-                        >
-                          🥽 View in AR
-                        </button>
-                      </>
-                    )}
-                    {file.status === 'converting' && (
-                      <div className="converting-spinner">Converting...</div>
-                    )}
-                  </div>
-                </div>
-              ))}
+          <section className="files-section">
+            <div className="container">
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-8 text-3xl font-bold text-green-500"
+              >
+                📋 Uploaded Files
+              </motion.h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                <AnimatePresence>
+                  {files.map((file, index) => (
+                    <motion.div
+                      key={index}
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                    >
+                      <ModernFileCard
+                        file={file}
+                        onConvert={() => convertToFBX(file)}
+                        onViewWebGL={() => openWebGLViewer(file)}
+                        onViewAR={() => openARViewer(file)}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
+          </section>
         )}
 
         <div className="info-section">
@@ -563,6 +571,22 @@ function App() {
       
       {/* Supabase Connection Test */}
       <SupabaseTest />
+      
+      {/* WebGL Viewer Modal */}
+      {showWebGLViewer && (
+        <WebGLViewer
+          modelUrl={currentModelUrl}
+          onClose={closeViewers}
+        />
+      )}
+      
+      {/* AR Viewer Modal */}
+      {showARViewer && (
+        <ARViewer
+          modelUrl={currentModelUrl}
+          onClose={closeViewers}
+        />
+      )}
     </div>
   );
 }
