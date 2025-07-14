@@ -6,6 +6,7 @@ import SupabaseTest from './components/SupabaseTest';
 import UnityCADViewer from './components/UnityCADViewer';
 import WebGLViewer from './components/WebGLViewer';
 import ARViewer from './components/ARViewer';
+import ARDeployment from './components/ARDeployment';
 import ModernUploadZone from './components/ModernUploadZone';
 import ModernFileCard from './components/ModernFileCard';
 import ModernButton from './components/ModernButton';
@@ -31,7 +32,9 @@ function App() {
   const [dragActive, setDragActive] = useState(false);
   const [showWebGLViewer, setShowWebGLViewer] = useState(false);
   const [showARViewer, setShowARViewer] = useState(false);
+  const [showARDeployment, setShowARDeployment] = useState(false);
   const [currentModelUrl, setCurrentModelUrl] = useState<string | undefined>(undefined);
+  const [currentFileName, setCurrentFileName] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = ['stl', 'step', 'obj', 'ply', 'dae'];
@@ -181,13 +184,15 @@ function App() {
   const openARViewer = (file: UploadedFile) => {
     if (file.status === 'converted' && file.convertedUrl) {
       setCurrentModelUrl(file.convertedUrl);
-      setShowARViewer(true);
+      setCurrentFileName(file.name);
+      setShowARDeployment(true);
     }
   };
 
   const openWebGLViewer = (file: UploadedFile) => {
     if (file.status === 'converted' && file.convertedUrl) {
       setCurrentModelUrl(file.convertedUrl);
+      setCurrentFileName(file.name);
       setShowWebGLViewer(true);
     }
   };
@@ -195,7 +200,9 @@ function App() {
   const closeViewers = () => {
     setShowWebGLViewer(false);
     setShowARViewer(false);
+    setShowARDeployment(false);
     setCurrentModelUrl(undefined);
+    setCurrentFileName(undefined);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -234,14 +241,8 @@ function App() {
       <nav className="navbar">
         <div className="nav-container">
           <div className="nav-brand">
-            <div className="logo-icon">H</div>
+            <div className="logo-icon">🥽</div>
             <span className="logo-text">HoloDraft</span>
-          </div>
-          <div className="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it Works</a>
-            <a href="#tech">Technology</a>
-            <button className="nav-cta">Get Started</button>
           </div>
         </div>
       </nav>
@@ -253,8 +254,8 @@ function App() {
             <h1 className="hero-title">HoloDraft</h1>
             <p className="hero-subtitle">Enterprise CAD-to-AR Platform</p>
             <p className="hero-description">
-              Revolutionary platform converting CAD files to immersive AR experiences. 
-              Streamlined pipeline from design files to MetaQuest deployment with WebGL preview capability.
+              Upload CAD files (STL, STEP, OBJ, PLY, DAE), convert them to FBX format, 
+              and view your 3D models in WebGL or deploy to AR headsets like MetaQuest.
             </p>
             <motion.div 
               className="hero-actions"
@@ -262,20 +263,15 @@ function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <ModernButton 
-                variant="primary" 
-                size="lg"
-                icon={<PlayCircle className="w-5 h-5" />}
-              >
-                Start Converting
-              </ModernButton>
-              <ModernButton 
-                variant="secondary" 
-                size="lg"
-                icon={<Eye className="w-5 h-5" />}
-              >
-                Watch Demo
-              </ModernButton>
+              <a href="#upload" style={{ textDecoration: 'none' }}>
+                <ModernButton 
+                  variant="primary" 
+                  size="lg"
+                  icon={<Upload className="w-5 h-5" />}
+                >
+                  Upload CAD Files
+                </ModernButton>
+              </a>
             </motion.div>
             <div className="hero-stats">
               <div className="stat">
@@ -314,8 +310,8 @@ function App() {
                 <h3>Revolutionary CAD Experience</h3>
                 <p>
                   HoloDraft bridges the gap between traditional CAD software and immersive AR technology. 
-                  Our platform enables engineers, designers, and creators to view and edit their 3D models 
-                  in a completely new dimension.
+                  Our platform enables engineers, designers, and creators to view their 3D models 
+                  in WebGL and AR environments.
                 </p>
               </div>
               <div className="overview-card">
@@ -340,7 +336,7 @@ function App() {
         </section>
 
         {/* Upload Section */}
-        <section className="upload-section">
+        <section id="upload" className="upload-section">
           <div className="container">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -415,8 +411,8 @@ function App() {
               <p>Experience your 3D models in augmented reality using MetaQuest</p>
             </div>
             <div className="info-card">
-              <h3>✏️ Edit</h3>
-              <p>Real-time editing capabilities in the AR environment</p>
+              <h3>🌐 WebGL</h3>
+              <p>Preview your 3D models in the browser before AR deployment</p>
             </div>
           </div>
         </div>
@@ -446,7 +442,7 @@ function App() {
                 <div className="step-number">3</div>
                 <div className="step-content">
                   <h3>AR Experience</h3>
-                  <p>View and edit your models in immersive AR on MetaQuest</p>
+                  <p>View your models in WebGL or deploy to MetaQuest for AR viewing</p>
                 </div>
               </div>
             </div>
@@ -531,43 +527,6 @@ function App() {
           </div>
         </section>
       </main>
-
-      <footer className="app-footer">
-        <div className="footer-container">
-          <div className="footer-content">
-            <div className="footer-brand">
-              <div className="footer-logo">
-                <span className="logo-icon">🎯</span>
-                <span className="logo-text">HoloDraft</span>
-              </div>
-              <p>Revolutionizing CAD design through AR technology</p>
-            </div>
-            <div className="footer-links">
-              <div className="footer-column">
-                <h4>Product</h4>
-                <a href="#features">Features</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#documentation">Documentation</a>
-              </div>
-              <div className="footer-column">
-                <h4>Support</h4>
-                <a href="#help">Help Center</a>
-                <a href="#contact">Contact Us</a>
-                <a href="#status">System Status</a>
-              </div>
-              <div className="footer-column">
-                <h4>Developers</h4>
-                <a href="#api">API Reference</a>
-                <a href="#sdk">SDK Download</a>
-                <a href="#github">GitHub</a>
-              </div>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <p>© 2024 HoloDraft. Bringing CAD to Augmented Reality.</p>
-          </div>
-        </div>
-      </footer>
       
       {/* Supabase Connection Test */}
       <SupabaseTest />
@@ -576,6 +535,7 @@ function App() {
       {showWebGLViewer && (
         <WebGLViewer
           modelUrl={currentModelUrl}
+          fileName={currentFileName}
           onClose={closeViewers}
         />
       )}
@@ -585,6 +545,16 @@ function App() {
         <ARViewer
           modelUrl={currentModelUrl}
           onClose={closeViewers}
+        />
+      )}
+      
+      {/* AR Deployment Modal */}
+      {showARDeployment && (
+        <ARDeployment
+          isOpen={showARDeployment}
+          onClose={closeViewers}
+          modelUrl={currentModelUrl}
+          fileName={currentFileName}
         />
       )}
     </div>

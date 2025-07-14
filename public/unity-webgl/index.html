@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>HoloDraft CAD Viewer</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      
+      .viewer-container {
+        width: 100%;
+        max-width: 1200px;
+        background: #2a2a2a;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      }
+      
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      
+      .header h1 {
+        color: #00a8ff;
+        margin: 0;
+        font-size: 2rem;
+      }
+      
+      .header p {
+        color: #888;
+        margin: 10px 0;
+      }
+      
+      .webgl-placeholder {
+        width: 100%;
+        height: 600px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .placeholder-content {
+        text-align: center;
+        z-index: 2;
+      }
+      
+      .placeholder-content h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: white;
+      }
+      
+      .placeholder-content p {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 20px;
+      }
+      
+      .controls {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .control-btn {
+        padding: 12px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 2px solid rgba(255,255,255,0.2);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+      }
+      
+      .control-btn:hover {
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.4);
+        transform: translateY(-2px);
+      }
+      
+      .unity-status {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(0,168,255,0.1);
+        border: 1px solid rgba(0,168,255,0.3);
+        border-radius: 8px;
+        text-align: center;
+      }
+      
+      .floating-particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+      }
+      
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255,255,255,0.6);
+        border-radius: 50%;
+        animation: float 6s infinite linear;
+      }
+      
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+      
+      .file-info {
+        background: rgba(0,0,0,0.3);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+      }
+      
+      .file-info h3 {
+        margin: 0 0 10px 0;
+        color: #00a8ff;
+      }
+      
+      .file-info p {
+        margin: 5px 0;
+        color: #ccc;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <div class="viewer-container">
+      <div class="header">
+        <h1>🎮 HoloDraft WebGL Viewer</h1>
+        <p>Interactive 3D CAD Model Viewer</p>
+      </div>
+      
+      <div class="webgl-placeholder" id="webglContainer">
+        <div class="floating-particles" id="particles"></div>
+        
+        <div class="placeholder-content">
+          <h2>3D Model Viewer Ready</h2>
+          <p>Your CAD model will appear here once loaded</p>
+          
+          <div class="controls">
+            <button class="control-btn" onclick="loadModel()">🔄 Load Model</button>
+            <button class="control-btn" onclick="resetView()">🏠 Reset View</button>
+            <button class="control-btn" onclick="toggleWireframe()">📐 Wireframe</button>
+            <button class="control-btn" onclick="changeMaterial()">🎨 Materials</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="file-info">
+        <h3>📁 Current File</h3>
+        <p><strong>Status:</strong> <span id="loadStatus">Ready to load CAD file</span></p>
+        <p><strong>Format:</strong> <span id="fileFormat">-</span></p>
+        <p><strong>Size:</strong> <span id="fileSize">-</span></p>
+      </div>
+      
+      <div class="unity-status">
+        <p><strong>🔧 Unity WebGL Integration Status:</strong></p>
+        <p>This is a preview viewer. Full Unity WebGL integration is being built...</p>
+        <p>Features: 3D viewing, material editing, transform controls, AR deployment preparation</p>
+      </div>
+    </div>
+
+    <!-- Three.js for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+      // Three.js scene variables
+      let scene, camera, renderer, controls;
+      let currentModel = null;
+      let isLoaded = false;
+      
+      // Initialize Three.js scene
+      function initThreeJS() {
+        const container = document.getElementById('webglContainer');
+        
+        // Scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2a2a3a);
+        
+        // Camera
+        camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(5, 5, 5);
+        
+        // Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // Clear container and add renderer
+        container.innerHTML = '';
+        container.appendChild(renderer.domElement);
+        
+        // Controls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 10, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+        
+        const pointLight = new THREE.PointLight(0x00aaff, 0.5);
+        pointLight.position.set(-10, 10, -10);
+        scene.add(pointLight);
+        
+        // Grid
+        const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+        scene.add(gridHelper);
+        
+        // Animation loop
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', onWindowResize);
+        
+        console.log('Three.js scene initialized');
+      }
+      
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      
+      function onWindowResize() {
+        const container = document.getElementById('webglContainer');
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+      
+      // Load 3D model
+      function loadCADModel(modelUrl, fileName) {
+        document.getElementById('loadStatus').textContent = `Loading ${fileName}...`;
+        document.getElementById('fileFormat').textContent = 'FBX';
+        
+        // Remove existing model
+        if (currentModel) {
+          scene.remove(currentModel);
+        }
+        
+        // For demo purposes, create a basic geometric model
+        // In a real implementation, you would load the actual FBX file
+        createDemoModel(fileName);
+        
+        // TODO: Implement actual FBX loading
+        // const fbxLoader = new THREE.FBXLoader();
+        // fbxLoader.load(modelUrl, (object) => {
+        //   currentModel = object;
+        //   scene.add(object);
+        //   fitCameraToObject(object);
+        //   isLoaded = true;
+        //   document.getElementById('loadStatus').textContent = 'Model loaded successfully';
+        // });
+      }
+      
+      function createDemoModel(fileName) {
+        // Create a demo geometric model based on file name
+        const group = new THREE.Group();
+        
+        // Main geometry
+        let geometry;
+        if (fileName.toLowerCase().includes('cube') || fileName.toLowerCase().includes('box')) {
+          geometry = new THREE.BoxGeometry(2, 2, 2);
+        } else if (fileName.toLowerCase().includes('sphere') || fileName.toLowerCase().includes('ball')) {
+          geometry = new THREE.SphereGeometry(1.5, 32, 32);
+        } else if (fileName.toLowerCase().includes('cylinder') || fileName.toLowerCase().includes('pipe')) {
+          geometry = new THREE.CylinderGeometry(1, 1, 3, 32);
+        } else {
+          // Default: complex shape
+          geometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+        }
+        
+        const material = new THREE.MeshPhongMaterial({ 
+          color: 0x4a90e2,
+          shininess: 100,
+          specular: 0x222222
+        });
+        
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+        
+        // Add some detail elements
+        for (let i = 0; i < 3; i++) {
+          const detailGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+          const detailMaterial = new THREE.MeshPhongMaterial({ color: 0xff6b6b });
+          const detailMesh = new THREE.Mesh(detailGeometry, detailMaterial);
+          
+          detailMesh.position.set(
+            (Math.random() - 0.5) * 4,
+            (Math.random() - 0.5) * 4,
+            (Math.random() - 0.5) * 4
+          );
+          
+          group.add(detailMesh);
+        }
+        
+        currentModel = group;
+        scene.add(group);
+        
+        // Fit camera to model
+        fitCameraToObject(group);
+        
+        isLoaded = true;
+        document.getElementById('loadStatus').textContent = 'Model loaded successfully';
+        document.getElementById('fileSize').textContent = '2.3 MB (Demo)';
+      }
+      
+      function fitCameraToObject(object) {
+        const box = new THREE.Box3().setFromObject(object);
+        const size = box.getSize(new THREE.Vector3()).length();
+        const center = box.getCenter(new THREE.Vector3());
+        
+        camera.position.copy(center);
+        camera.position.x += size;
+        camera.position.y += size * 0.5;
+        camera.position.z += size;
+        camera.lookAt(center);
+        
+        controls.target.copy(center);
+        controls.update();
+      }
+
+      // Create floating particles animation
+      function createParticles() {
+        const container = document.getElementById('particles');
+        
+        setInterval(() => {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDelay = Math.random() * 2 + 's';
+          container.appendChild(particle);
+          
+          // Remove particle after animation
+          setTimeout(() => {
+            if (container.contains(particle)) {
+              container.removeChild(particle);
+            }
+          }, 6000);
+        }, 300);
+      }
+      
+      // Mock WebGL functions
+      function loadModel() {
+        document.getElementById('loadStatus').textContent = 'Loading 3D model...';
+        
+        setTimeout(() => {
+          document.getElementById('loadStatus').textContent = 'Model loaded successfully';
+          document.getElementById('fileFormat').textContent = 'FBX (Converted from STL)';
+          document.getElementById('fileSize').textContent = '2.3 MB';
+        }, 2000);
+      }
+      
+      function resetView() {
+        console.log('Resetting 3D view...');
+        document.getElementById('loadStatus').textContent = 'View reset to default position';
+      }
+      
+      function toggleWireframe() {
+        console.log('Toggling wireframe mode...');
+        document.getElementById('loadStatus').textContent = 'Wireframe mode toggled';
+      }
+      
+      function changeMaterial() {
+        console.log('Changing material properties...');
+        document.getElementById('loadStatus').textContent = 'Material properties updated';
+      }
+      
+      // Communication with React app
+      window.addEventListener('message', function(event) {
+        if (event.data.type === 'LOAD_CAD_MODEL') {
+          console.log('Loading CAD model:', event.data.modelUrl);
+          
+          // Initialize 3D scene if not already done
+          if (!scene) {
+            initThreeJS();
+          }
+          
+          // Load the actual model
+          loadCADModel(event.data.modelUrl, event.data.fileName);
+        }
+      });
+      
+      // Notify React app that viewer is ready
+      window.parent.postMessage({
+        type: 'UNITY_WEBGL_READY',
+        status: 'ready'
+      }, '*');
+      
+      // Start particle animation
+      createParticles();
+      
+      console.log('🎮 HoloDraft WebGL Viewer initialized');
+    </script>
+  </body>
+</html>

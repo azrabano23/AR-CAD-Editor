@@ -198,7 +198,7 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
                 icon={<Smartphone className="w-4 h-4" />}
                 className="flex-1 min-w-0"
               >
-                AR View
+                Deploy to AR
               </ModernButton>
             </>
           )}

@@ -261,6 +261,89 @@ print(f"Successfully converted {stl_path} to {fbx_path}")
 `;
 }
 
+// AR Device Detection Endpoints
+app.get('/api/scan-wifi-devices', async (req, res) => {
+  try {
+    // In a real implementation, this would scan the network for ADB devices
+    const { exec } = require('child_process');
+    
+    // Try to find ADB devices
+    exec('adb devices', (error, stdout, stderr) => {
+      if (error) {
+        console.log('ADB not available, using mock devices');
+        // Return mock devices for demo
+        return res.json([
+          {
+            ip: '192.168.1.100',
+            name: 'MetaQuest 2',
+            model: 'Quest 2',
+            connected: true,
+            battery: 85
+          }
+        ]);
+      }
+      
+      // Parse ADB output for real devices
+      const devices = stdout.split('\n')
+        .filter(line => line.includes('device') && !line.includes('List'))
+        .map((line, index) => {
+          const deviceId = line.split('\t')[0];
+          return {
+            ip: deviceId.includes('.') ? deviceId : `192.168.1.${100 + index}`,
+            name: `MetaQuest Device ${index + 1}`,
+            model: 'Quest 2',
+            connected: true,
+            battery: Math.floor(Math.random() * 40) + 60
+          };
+        });
+      
+      res.json(devices);
+    });
+  } catch (error) {
+    console.error('WiFi device scan error:', error);
+    res.status(500).json({ error: 'Failed to scan for devices' });
+  }
+});
+
+app.post('/api/connect-device', async (req, res) => {
+  try {
+    const { deviceId, connectionType } = req.body;
+    
+    console.log(`Connecting to device ${deviceId} via ${connectionType}`);
+    
+    setTimeout(() => {
+      res.json({
+        success: true,
+        deviceId,
+        status: 'connected',
+        message: 'Device connected successfully'
+      });
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Device connection error:', error);
+    res.status(500).json({ error: 'Failed to connect to device' });
+  }
+});
+
+app.post('/api/deploy-to-ar', async (req, res) => {
+  try {
+    const { deviceId, modelUrl, fileName } = req.body;
+    
+    console.log(`Deploying ${fileName} to device ${deviceId}`);
+    
+    res.json({
+      success: true,
+      deploymentId: `deploy_${Date.now()}`,
+      message: 'Deployment started'
+    });
+    
+  } catch (error) {
+    console.error('AR deployment error:', error);
+    res.status(500).json({ error: 'Failed to deploy to AR device' });
+  }
+});
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {

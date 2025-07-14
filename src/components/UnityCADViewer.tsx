@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { HoloDraftFile } from '../lib/supabaseClient';
-import UnityWebGLWrapper from '../../unity-integration/React/UnityWebGLWrapper';
 
 interface UnityCADViewerProps {
   file: HoloDraftFile;
@@ -225,16 +224,31 @@ export const UnityCADViewer: React.FC<UnityCADViewerProps> = ({
       <div className="viewer-content">
         {/* Unity Viewer */}
         <div className="unity-container">
-          <UnityWebGLWrapper
+          <iframe
             ref={unityRef}
-            file={file}
-            onUnityReady={handleUnityReady}
-            onModelLoaded={handleModelLoaded}
-            onModelTransformed={handleModelTransformed}
-            onARSessionStatus={handleARSessionStatus}
-            onError={handleError}
-            height="100%"
-            className="unity-viewer"
+            src="/unity-webgl/index.html"
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              background: '#1a1a1a'
+            }}
+            onLoad={() => {
+              handleUnityReady();
+              
+              // Send model data to WebGL viewer
+              if (unityRef.current && file.converted_url) {
+                setTimeout(() => {
+                  unityRef.current.contentWindow.postMessage({
+                    type: 'LOAD_CAD_MODEL',
+                    modelUrl: file.converted_url,
+                    fileName: file.original_name,
+                    fileId: file.id
+                  }, '*');
+                  handleModelLoaded(file.id.toString());
+                }, 1000);
+              }
+            }}
           />
         </div>
 

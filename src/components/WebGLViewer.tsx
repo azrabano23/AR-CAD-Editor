@@ -1,12 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface WebGLViewerProps {
   modelUrl?: string;
+  fileName?: string;
   onClose: () => void;
 }
 
-const WebGLViewer: React.FC<WebGLViewerProps> = ({ modelUrl, onClose }) => {
+const WebGLViewer: React.FC<WebGLViewerProps> = ({ modelUrl, fileName, onClose }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -19,9 +21,24 @@ const WebGLViewer: React.FC<WebGLViewerProps> = ({ modelUrl, onClose }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const webglUrl = modelUrl 
-    ? `/unity-builds/webgl-fixed/index.html?model=${encodeURIComponent(modelUrl)}`
-    : '/unity-builds/webgl-fixed/index.html';
+  useEffect(() => {
+    // Send model data to WebGL viewer when iframe loads and model URL is available
+    if (isLoaded && modelUrl && fileName && iframeRef.current) {
+      setTimeout(() => {
+        iframeRef.current?.contentWindow?.postMessage({
+          type: 'LOAD_CAD_MODEL',
+          modelUrl: modelUrl,
+          fileName: fileName
+        }, '*');
+      }, 1000);
+    }
+  }, [isLoaded, modelUrl, fileName]);
+
+  const handleIframeLoad = () => {
+    setIsLoaded(true);
+  };
+
+  const webglUrl = '/unity-webgl/index.html';
 
   return (
     <div className="webgl-viewer-overlay">
@@ -38,6 +55,7 @@ const WebGLViewer: React.FC<WebGLViewerProps> = ({ modelUrl, onClose }) => {
             height="100%"
             style={{ border: 'none' }}
             title="WebGL 3D Viewer"
+            onLoad={handleIframeLoad}
           />
         </div>
         <div className="webgl-viewer-controls">

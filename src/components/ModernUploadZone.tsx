@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, File, CheckCircle, AlertCircle } from 'lucide-react';
+import ModernButton from './ModernButton';
 
 interface ModernUploadZoneProps {
   onDrop: (files: FileList) => void;
@@ -166,7 +167,7 @@ const ModernUploadZone: React.FC<ModernUploadZoneProps> = ({
             ))}
           </>
         )}
-      </AnimatePresence>
+</AnimatePresence>
 
       <div className="relative z-10">
         {/* Icon */}
@@ -200,6 +201,18 @@ const ModernUploadZone: React.FC<ModernUploadZoneProps> = ({
           Maximum file size: {formatFileSize(maxSize)}
         </p>
 
+        {/* Add a button */}
+        <motion.div
+          className="mt-4"
+        >
+          <ModernButton
+            onClick={() => fileInputRef.current?.click()}
+            variant="primary"
+            size="lg"
+          >
+            Select Files
+          </ModernButton>
+        </motion.div>
         {/* Progress indicator */}
         <AnimatePresence>
           {uploadStatus === 'success' && (
