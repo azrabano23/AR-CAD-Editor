@@ -1,64 +1,129 @@
-# AR/VR Visualization of Data - HoloDraft
+# HoloDraft - CAD to AR Platform
 
-## Overview
-
-HoloDraft is an enterprise-grade CAD-to-AR visualization platform that enables engineers, designers, and creators to transform traditional CAD files into immersive augmented reality experiences. The platform bridges the gap between traditional CAD software and cutting-edge AR technology, specifically targeting MetaQuest devices for deployment.
+A modern web application that transforms CAD designs into immersive AR experiences for MetaQuest headsets. Upload your 3D files and deploy instantly to AR.
 
 ## Features
 
-- Multi-Format CAD Support: Upload and process STL, STEP, OBJ, PLY, and DAE files
-- Automated Conversion Pipeline: Seamless conversion to AR-ready FBX format using Blender
-- WebGL Preview: Real-time browser-based 3D model visualization
-- AR Deployment: Direct deployment to MetaQuest devices via USB, WiFi, or Bluetooth
-- Cloud Integration: Supabase backend for file storage and management
-- Real-time Processing: Live conversion status and progress tracking
+### Core Functionality
+- **Multi-format CAD Support**: STL, STEP, OBJ, PLY, DAE file formats
+- **Real-time Conversion**: Automatic FBX conversion for AR compatibility
+- **AR Deployment**: Direct deployment to MetaQuest headsets
+- **WebGL Preview**: Interactive 3D model viewer
+- **Project Management**: Organize and manage multiple CAD projects
 
-## Technical Stack
+### User Interface
+- **Modern Dark Theme**: Professional black/green interface
+- **Responsive Design**: Optimized for desktop and mobile
+- **Drag & Drop Upload**: Intuitive file upload experience
+- **Real-time Progress**: Live upload and conversion feedback
+- **File Management**: Comprehensive project workspace
 
-### Frontend (React + TypeScript)
-- Framework: React 18 with TypeScript for type safety
-- UI Components: Modern, responsive design with Framer Motion animations
-- 3D Rendering: Three.js for WebGL visualization
-- Styling: Custom CSS with dark mode and green accent theme
+### Technical Features
+- **Authentication System**: Secure user accounts with Supabase
+- **Database Integration**: PostgreSQL with real-time updates
+- **File Processing**: Backend API for CAD file conversion
+- **Error Handling**: Robust error management and user feedback
 
-### Backend (Node.js + Express)
-- Runtime: Node.js with Express.js framework
-- File Processing: Multer for file uploads, Blender Python API for conversions
-- Database: Supabase for cloud storage and metadata
-- AR Integration: ADB (Android Debug Bridge) for device communication
+## Technology Stack
+
+### Frontend
+- **React 18** with TypeScript
+- **Framer Motion** for animations
+- **Tailwind CSS** for styling
+- **Lucide React** for icons
+
+### Backend
+- **Node.js** with Express
+- **Supabase** for authentication and database
+- **PostgreSQL** for data storage
+- **File processing** API for CAD conversion
 
 ### AR/VR Integration
-- Target Platform: MetaQuest 2/3 devices
-- Unity Engine: WebGL builds for browser preview
-- Deployment: Custom APK generation and sideloading
+- **Unity WebGL** build system
+- **Mixed Reality Toolkit** (MRTK)
+- **MetaQuest** deployment ready
+
+## Getting Started
+
+### Prerequisites
+- Node.js 16+ 
+- npm or yarn
+- Supabase account
+- Unity 2022.3+ (for AR features)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/azrabano23/AR-CAD-Editor.git
+cd AR-CAD-Editor
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env
+```
+
+4. Configure your `.env` file:
+```env
+REACT_APP_SUPABASE_URL=your_supabase_url
+REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+REACT_APP_API_URL=http://localhost:3001
+```
+
+5. Start the development server:
+```bash
+npm start
+```
+
+### Backend Setup
+
+1. Navigate to backend directory:
+```bash
+cd backend
+npm install
+```
+
+2. Start the backend server:
+```bash
+npm start
+```
+
+The backend will run on `http://localhost:3001`
 
 ## Project Structure
 
 ```
-ar-vr-visualization-of-data/
-├── src/                          # React frontend source
-│   ├── components/
-│   │   ├── ModernUploadZone.tsx  # File upload interface
-│   │   ├── ModernFileCard.tsx    # File management UI
-│   │   ├── WebGLViewer.tsx       # 3D model viewer
-│   │   ├── ARDeployment.tsx      # AR device deployment
-│   │   └── UnityCADViewer.tsx    # Unity WebGL integration
-│   ├── App.tsx                   # Main application component
-│   └── App.css                   # Application styling
-├── backend/
-│   ├── server.js                 # Express.js server
-│   ├── uploads/                  # Temporary file storage
-│   ├── converted/                # Processed FBX files
-│   └── scripts/                  # Blender conversion scripts
-├── public/
-│   └── unity-webgl/              # Unity WebGL build output
-├── Assets/                       # Unity project files
-│   ├── Scripts/
-│   │   └── CAD/
-│   │       └── CADModelManager.cs # Unity CAD handling
-│   └── Editor/
-│       └── WebGLBuilder.cs       # Automated WebGL builds
-└── package.json                  # Dependencies and scripts
+src/
+├── components/           # React components
+│   ├── Dashboard.tsx    # User dashboard
+│   ├── ProjectWorkspace.tsx  # File upload workspace
+│   ├── AuthPage.tsx     # Authentication
+│   ├── ModernUploadZone.tsx  # Drag & drop upload
+│   └── ModernButton.tsx # Reusable button component
+├── lib/                 # Utilities and services
+│   ├── supabaseClient.ts    # Database client
+│   └── mockAuth.ts      # Development authentication
+├── App.tsx              # Main application
+├── App.css              # Global styles
+└── index.tsx            # Application entry point
+
+backend/
+├── server.js            # Express server
+├── routes/              # API routes
+│   ├── upload.js        # File upload handling
+│   └── convert.js       # CAD file conversion
+└── middleware/          # Custom middleware
+
+Assets/                  # Unity project files
+├── Scripts/             # C# scripts
+├── Scenes/              # Unity scenes
+└── Prefabs/             # Reusable objects
 ```
 
 ## Component Architecture
