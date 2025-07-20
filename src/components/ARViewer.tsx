@@ -32,6 +32,18 @@ const ARViewer: React.FC<ARViewerProps> = ({ modelUrl, onClose }) => {
 
   const handleIframeLoad = () => {
     setIsLoading(false);
+    
+    // Send model data to AR viewer
+    if (modelUrl && iframeRef.current) {
+      setTimeout(() => {
+        iframeRef.current?.contentWindow?.postMessage({
+          type: 'LOAD_AR_MODEL',
+          modelUrl: modelUrl,
+          fileName: modelUrl.split('/').pop() || 'model'
+        }, '*');
+      }, 1000);
+    }
+    
     if (!checkARSupport()) {
       setError('AR functionality is best experienced on mobile devices or VR headsets like MetaQuest.');
     }
@@ -43,8 +55,25 @@ const ARViewer: React.FC<ARViewerProps> = ({ modelUrl, onClose }) => {
   };
 
   const downloadForQuest = () => {
-    // This would trigger download/deployment to MetaQuest
-    alert('Quest deployment feature coming soon! For now, you can sideload the APK file.');
+    // Enhanced deployment functionality
+    const deploymentSteps = `
+🥽 MetaQuest Deployment Steps:
+
+1. Enable Developer Mode on your Quest
+2. Connect Quest to your computer via USB
+3. Install SideQuest or use ADB commands
+4. Deploy the HoloDraft AR app
+5. Transfer your 3D model files
+
+🔗 For detailed instructions, visit:
+https://developer.oculus.com/documentation/unity/unity-gs-overview/
+
+📱 Alternative: Use the 'Generate QR Code' option to view on mobile AR
+    `;
+    
+    if (confirm('Would you like to see deployment instructions?')) {
+      alert(deploymentSteps);
+    }
   };
 
   const arUrl = modelUrl 
@@ -70,9 +99,23 @@ const ARViewer: React.FC<ARViewerProps> = ({ modelUrl, onClose }) => {
           <div className="ar-error">
             <div className="error-icon">⚠️</div>
             <p>{error}</p>
-            <button className="quest-download-btn" onClick={downloadForQuest}>
-              📱 Deploy to MetaQuest
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button className="quest-download-btn" onClick={downloadForQuest}>
+                🥽 MetaQuest Guide
+              </button>
+              <button 
+                className="quest-download-btn" 
+                style={{ background: 'linear-gradient(135deg, #4facfe, #00f2fe)' }}
+                onClick={() => {
+                  const currentUrl = window.location.href;
+                  navigator.clipboard.writeText(currentUrl).then(() => {
+                    alert('📱 Mobile AR Link Copied!\n\nOpen this link on your mobile device for AR experience.');
+                  });
+                }}
+              >
+                📱 Copy Mobile Link
+              </button>
+            </div>
           </div>
         )}
         

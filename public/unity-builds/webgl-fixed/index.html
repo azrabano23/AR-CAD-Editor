@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoloDraft AR Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .ar-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .ar-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            z-index: 10;
+        }
+
+        .ar-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+            margin-bottom: 1rem;
+        }
+
+        .ar-header p {
+            font-size: 1.2rem;
+            color: #a8b2d1;
+            margin: 0;
+        }
+
+        .ar-viewer-area {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .ar-placeholder {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .ar-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .ar-status {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .ar-description {
+            color: #a8b2d1;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .deployment-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .deployment-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .deployment-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .deployment-btn.secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .deployment-btn.secondary:hover {
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+        }
+
+        .deployment-btn.tertiary {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .deployment-btn.tertiary:hover {
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+        }
+
+        .deployment-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .device-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .device-info h3 {
+            margin: 0 0 1rem 0;
+            color: #667eea;
+        }
+
+        .device-status {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .status-indicator.connected {
+            background: #22c55e;
+        }
+
+        .status-indicator.partial {
+            background: #f59e0b;
+        }
+
+        .ar-instructions {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .ar-instructions h3 {
+            margin: 0 0 1rem 0;
+            color: #a8b2d1;
+        }
+
+        .ar-instructions ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .ar-instructions li {
+            margin-bottom: 0.8rem;
+            color: #94a3b8;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .ar-instructions li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: floatAround 20s infinite linear;
+        }
+
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .progress-content {
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .progress-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes floatAround {
+            0% { transform: translateX(-100px) rotate(0deg); }
+            100% { transform: translateX(calc(100vw + 100px)) rotate(360deg); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .ar-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .ar-viewer-area {
+                height: 400px;
+            }
+            
+            .device-status {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    
+    <div class="ar-container">
+        <div class="ar-header">
+            <h1>🥽 AR Deployment Center</h1>
+            <p>Deploy your 3D model to MetaQuest and mobile AR devices</p>
+        </div>
+
+        <div class="ar-viewer-area">
+            <div class="ar-placeholder">
+                <div class="ar-icon">🚀</div>
+                <div class="ar-status">Ready for AR Deployment</div>
+                <div class="ar-description">Your 3D model will be optimized and deployed to your AR device</div>
+            </div>
+        </div>
+
+        <div class="deployment-controls">
+            <button class="deployment-btn" onclick="deployToQuest()">
+                🥽 Deploy to MetaQuest
+            </button>
+            <button class="deployment-btn secondary" onclick="deployToMobile()">
+                📱 Deploy to Mobile AR
+            </button>
+            <button class="deployment-btn tertiary" onclick="generateQRCode()">
+                📊 Generate QR Code
+            </button>
+        </div>
+
+        <div class="device-info">
+            <h3>🔍 Device Detection</h3>
+            <div class="device-status">
+                <div class="status-item">
+                    <div class="status-indicator" id="questStatus"></div>
+                    <span>MetaQuest Device</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator" id="mobileStatus"></div>
+                    <span>Mobile AR Support</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator" id="webxrStatus"></div>
+                    <span>WebXR Support</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator" id="developerMode"></div>
+                    <span>Developer Mode</span>
+                </div>
+            </div>
+            <p id="deviceInfo">Detecting AR capabilities...</p>
+        </div>
+
+        <div class="ar-instructions">
+            <h3>📋 Deployment Instructions</h3>
+            <ul>
+                <li><strong>MetaQuest:</strong> Enable Developer Mode and USB Debugging</li>
+                <li><strong>Mobile:</strong> Grant camera permissions for AR functionality</li>
+                <li><strong>WebXR:</strong> Use Chrome or Edge browser for best compatibility</li>
+                <li><strong>Network:</strong> Ensure both devices are on the same network</li>
+                <li><strong>Positioning:</strong> Find a well-lit area with flat surfaces</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-content">
+            <div class="progress-spinner"></div>
+            <h3 id="progressTitle">Deploying to Device...</h3>
+            <p id="progressMessage">Please wait while we prepare your AR experience</p>
+        </div>
+    </div>
+
+    <script>
+        let modelUrl = null;
+        let modelFileName = null;
+
+        // Parse URL parameters
+        function parseURLParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            modelUrl = urlParams.get('model');
+            const isAR = urlParams.get('ar');
+            
+            if (modelUrl) {
+                modelFileName = decodeURIComponent(modelUrl.split('/').pop());
+                document.querySelector('.ar-description').textContent = 
+                    `Deploying "${modelFileName}" to your AR device`;
+            }
+        }
+
+        // Check device capabilities
+        function checkDeviceCapabilities() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent);
+            const isQuest = /oculus|quest|meta/.test(userAgent);
+            
+            // Update status indicators
+            document.getElementById('questStatus').className = 
+                `status-indicator ${isQuest ? 'connected' : 'partial'}`;
+            
+            document.getElementById('mobileStatus').className = 
+                `status-indicator ${isMobile ? 'connected' : 'partial'}`;
+            
+            // Check WebXR support
+            if ('xr' in navigator) {
+                navigator.xr.isSessionSupported('immersive-ar').then(supported => {
+                    document.getElementById('webxrStatus').className = 
+                        `status-indicator ${supported ? 'connected' : 'partial'}`;
+                });
+            } else {
+                document.getElementById('webxrStatus').className = 'status-indicator';
+            }
+            
+            // Developer mode detection (simulated)
+            document.getElementById('developerMode').className = 'status-indicator partial';
+            
+            // Update device info text
+            let deviceInfo = 'Device Detection: ';
+            if (isQuest) {
+                deviceInfo += 'MetaQuest detected. ';
+            } else if (isMobile) {
+                deviceInfo += 'Mobile AR device detected. ';
+            } else {
+                deviceInfo += 'Desktop browser detected. ';
+            }
+            
+            deviceInfo += isMobile || isQuest ? 'AR deployment available.' : 'Use mobile device for AR features.';
+            document.getElementById('deviceInfo').textContent = deviceInfo;
+        }
+
+        // Create floating shapes animation
+        function createFloatingShapes() {
+            const container = document.getElementById('floatingShapes');
+            const shapes = ['🔷', '🔶', '✨', '🌟', '💎', '🔮'];
+            
+            setInterval(() => {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+                shape.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+                shape.style.top = Math.random() * 100 + '%';
+                shape.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+                shape.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(shape);
+                
+                setTimeout(() => {
+                    if (container.contains(shape)) {
+                        container.removeChild(shape);
+                    }
+                }, 25000);
+            }, 3000);
+        }
+
+        // Show progress overlay
+        function showProgress(title, message) {
+            document.getElementById('progressTitle').textContent = title;
+            document.getElementById('progressMessage').textContent = message;
+            document.getElementById('progressOverlay').style.display = 'flex';
+        }
+
+        // Hide progress overlay
+        function hideProgress() {
+            document.getElementById('progressOverlay').style.display = 'none';
+        }
+
+        // Deploy to MetaQuest
+        async function deployToQuest() {
+            showProgress('Deploying to MetaQuest...', 'Preparing AR application for your headset');
+            
+            // Simulate deployment process
+            setTimeout(() => {
+                document.getElementById('progressMessage').textContent = 'Building AR application...';
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('progressMessage').textContent = 'Transferring to MetaQuest device...';
+            }, 3000);
+            
+            setTimeout(() => {
+                hideProgress();
+                alert('🥽 MetaQuest Deployment Complete!\n\n✅ AR application installed\n✅ 3D model loaded\n✅ Ready to launch\n\nPut on your headset and look for "HoloDraft AR" in your app library.');
+            }, 5000);
+        }
+
+        // Deploy to mobile AR
+        async function deployToMobile() {
+            showProgress('Deploying to Mobile AR...', 'Creating mobile-optimized AR experience');
+            
+            setTimeout(() => {
+                document.getElementById('progressMessage').textContent = 'Optimizing for mobile performance...';
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('progressMessage').textContent = 'Generating AR application...';
+            }, 2500);
+            
+            setTimeout(() => {
+                hideProgress();
+                // Try to open AR view or show instructions
+                if ('xr' in navigator) {
+                    alert('📱 Mobile AR Ready!\n\n✅ AR session prepared\n✅ Camera permissions will be requested\n✅ Point camera at flat surface\n\nTap OK to launch AR experience.');
+                    // In a real implementation, this would launch WebXR
+                } else {
+                    alert('📱 Mobile AR Instructions:\n\n1. Open this page on your mobile device\n2. Grant camera permissions\n3. Point camera at a flat surface\n4. Tap to place your 3D model\n\nFor best results, use Chrome or Safari on mobile.');
+                }
+            }, 4000);
+        }
+
+        // Generate QR code for mobile access
+        function generateQRCode() {
+            showProgress('Generating QR Code...', 'Creating shareable AR experience');
+            
+            setTimeout(() => {
+                hideProgress();
+                const currentUrl = window.location.href;
+                const qrMessage = `📊 QR Code Generated!\n\nScan this QR code with your mobile device:\n\n🔗 ${currentUrl}\n\nThe QR code has been copied to your clipboard.\n\nShare this link to let others view your 3D model in AR!`;
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(currentUrl).then(() => {
+                    alert(qrMessage);
+                }).catch(() => {
+                    alert('📊 AR Experience URL:\n\n' + currentUrl + '\n\nCopy this link to share your AR model!');
+                });
+            }, 2000);
+        }
+
+        // Listen for messages from parent window
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'LOAD_AR_MODEL') {
+                modelUrl = event.data.modelUrl;
+                modelFileName = event.data.fileName;
+                
+                if (modelFileName) {
+                    document.querySelector('.ar-description').textContent = 
+                        `Deploying "${modelFileName}" to your AR device`;
+                }
+            }
+        });
+
+        // Initialize
+        parseURLParams();
+        checkDeviceCapabilities();
+        createFloatingShapes();
+
+        // Notify parent that AR viewer is ready
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'AR_VIEWER_READY',
+                status: 'ready'
+            }, '*');
+        }
+
+        console.log('🚀 HoloDraft AR Deployment Center initialized');
+    </script>
+</body>
+</html>

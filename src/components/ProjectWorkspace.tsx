@@ -20,9 +20,15 @@ import {
   ZoomOut,
   Grid,
   Layers,
-  Palette
+  Palette,
+  Smartphone,
+  VrHeadset,
+  Cube,
+  Send
 } from 'lucide-react';
 import ModernButton from './ModernButton';
+import WebGLViewer from './WebGLViewer';
+import ARViewer from './ARViewer';
 import './ProjectWorkspace.css';
 
 interface ProjectWorkspaceProps {
@@ -52,6 +58,10 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
   const [isSaving, setIsSaving] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'preview' | 'list'>('preview');
+  const [showWebGLViewer, setShowWebGLViewer] = useState(false);
+  const [showARViewer, setShowARViewer] = useState(false);
+  const [currentModelUrl, setCurrentModelUrl] = useState<string | null>(null);
+  const [currentFileName, setCurrentFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = ['stl', 'step', 'stp', 'obj', 'ply', 'dae', '3ds', 'fbx'];
@@ -175,6 +185,32 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handlePreviewFile = (uploadFile: UploadedFile) => {
+    // Create a temporary URL for the file to simulate a model URL
+    const modelUrl = URL.createObjectURL(uploadFile.file);
+    setCurrentModelUrl(modelUrl);
+    setCurrentFileName(uploadFile.file.name);
+    setShowWebGLViewer(true);
+  };
+
+  const handleDeployToAR = (uploadFile: UploadedFile) => {
+    // Create a temporary URL for the file to simulate a model URL
+    const modelUrl = URL.createObjectURL(uploadFile.file);
+    setCurrentModelUrl(modelUrl);
+    setCurrentFileName(uploadFile.file.name);
+    setShowARViewer(true);
+  };
+
+  const closeViewers = () => {
+    setShowWebGLViewer(false);
+    setShowARViewer(false);
+    if (currentModelUrl) {
+      URL.revokeObjectURL(currentModelUrl);
+    }
+    setCurrentModelUrl(null);
+    setCurrentFileName(null);
   };
 
   return (
@@ -311,9 +347,23 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
                             <>
                               <button
                                 className="action-btn preview-btn"
-                                title="Preview"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePreviewFile(uploadFile);
+                                }}
+                                title="3D Preview"
                               >
                                 <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                className="action-btn ar-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeployToAR(uploadFile);
+                                }}
+                                title="Deploy to AR"
+                              >
+                                <Smartphone className="w-4 h-4" />
                               </button>
                               <button
                                 className="action-btn download-btn"
@@ -343,42 +393,67 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
           </div>
 
           {/* 3D Preview Panel (if file selected) */}
-          {selectedFile && (
-            <div className="preview-panel">
-              <div className="preview-header">
-                <h3>3D Preview</h3>
-                <div className="preview-controls">
-                  <button className="control-btn">
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-                  <button className="control-btn">
-                    <ZoomIn className="w-4 h-4" />
-                  </button>
-                  <button className="control-btn">
-                    <ZoomOut className="w-4 h-4" />
-                  </button>
-                  <button className="control-btn">
-                    <Layers className="w-4 h-4" />
-                  </button>
-                  <button className="control-btn">
-                    <Palette className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="preview-viewport">
-                <div className="preview-placeholder">
-                  <div className="preview-icon">
-                    <Eye className="w-16 h-16" />
+          {selectedFile && (() => {
+            const selectedUploadFile = uploadedFiles.find(f => f.id === selectedFile);
+            return selectedUploadFile && selectedUploadFile.status === 'complete' ? (
+              <div className="preview-panel">
+                <div className="preview-header">
+                  <h3>3D Model Actions</h3>
+                  <div className="preview-controls">
+                    <ModernButton
+                      variant="secondary"
+                      size="sm"
+                      icon={<Cube className="w-4 h-4" />}
+                      onClick={() => handlePreviewFile(selectedUploadFile)}
+                    >
+                      3D Preview
+                    </ModernButton>
+                    <ModernButton
+                      variant="primary"
+                      size="sm"
+                      icon={<VrHeadset className="w-4 h-4" />}
+                      onClick={() => handleDeployToAR(selectedUploadFile)}
+                    >
+                      Deploy to AR
+                    </ModernButton>
                   </div>
-                  <h4>3D Model Preview</h4>
-                  <p>Interactive 3D preview will be rendered here</p>
+                </div>
+                
+                <div className="preview-viewport">
+                  <div className="preview-placeholder">
+                    <div className="preview-icon">
+                      <Cube className="w-16 h-16" />
+                    </div>
+                    <h4>{selectedUploadFile.file.name}</h4>
+                    <p>Click "3D Preview" to view in WebGL or "Deploy to AR" for AR experience</p>
+                    <div className="model-info">
+                      <span>Size: {formatFileSize(selectedUploadFile.file.size)}</span>
+                      <span>Type: {selectedUploadFile.file.name.split('.').pop()?.toUpperCase()}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            ) : null;
+          })()}
         </div>
       </div>
+
+      {/* WebGL Viewer Modal */}
+      {showWebGLViewer && (
+        <WebGLViewer
+          modelUrl={currentModelUrl || undefined}
+          fileName={currentFileName || undefined}
+          onClose={closeViewers}
+        />
+      )}
+
+      {/* AR Viewer Modal */}
+      {showARViewer && (
+        <ARViewer
+          modelUrl={currentModelUrl || undefined}
+          onClose={closeViewers}
+        />
+      )}
     </div>
   );
 };
