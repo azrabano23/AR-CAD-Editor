@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Smartphone, Wifi, UsbIcon, CheckCircle, AlertCircle, Loader, Settings, Play } from 'lucide-react';
 
@@ -31,13 +31,7 @@ const ARDeployment: React.FC<ARDeploymentProps> = ({
   const [isScanning, setIsScanning] = useState(false);
   const [connectionMethod, setConnectionMethod] = useState<'auto' | 'usb' | 'wifi'>('auto');
 
-  useEffect(() => {
-    if (isOpen) {
-      scanForDevices();
-    }
-  }, [isOpen]);
-
-  const scanForDevices = async () => {
+  const scanForDevices = useCallback(async () => {
     setIsScanning(true);
     setAvailableDevices([]);
 
@@ -79,19 +73,25 @@ const ARDeployment: React.FC<ARDeploymentProps> = ({
     }
     
     setIsScanning(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      scanForDevices();
+    }
+  }, [isOpen, scanForDevices]);
 
   const scanUSBDevices = async (): Promise<HeadsetDevice[]> => {
     // Try to detect USB connected Quest devices via ADB
     try {
-      if (navigator.usb) {
-        const devices = await navigator.usb.getDevices();
+      if ((navigator as any).usb) {
+        const devices = await (navigator as any).usb.getDevices();
         const questDevices = devices
-          .filter(device => 
+          .filter((device: any) => 
             device.vendorId === 0x2833 || // Meta/Oculus vendor ID
             device.productName?.toLowerCase().includes('quest')
           )
-          .map((device, index) => ({
+          .map((device: any, index: number) => ({
             id: `usb-quest-${index}`,
             name: device.productName || `MetaQuest (USB)`,
             type: 'quest2' as const,
@@ -132,8 +132,8 @@ const ARDeployment: React.FC<ARDeploymentProps> = ({
   const scanBluetoothDevices = async (): Promise<HeadsetDevice[]> => {
     // Scan for Bluetooth devices
     try {
-      if (navigator.bluetooth) {
-        const device = await navigator.bluetooth.requestDevice({
+      if ((navigator as any).bluetooth) {
+        const device = await (navigator as any).bluetooth.requestDevice({
           filters: [{ namePrefix: 'Quest' }],
           optionalServices: ['battery_service']
         });
@@ -454,19 +454,12 @@ const ARDeployment: React.FC<ARDeploymentProps> = ({
                 </h3>
                 
                 <div className="bg-green-50 p-6 rounded-lg">
-                  <p className="text-green-800 mb-4">
-                    Your CAD model has been successfully deployed to <strong>{selectedDevice.name}</strong>
+                  <p className="text-green-800 mb-4 text-center">
+                    <strong>Deployment Successful!</strong>
                   </p>
-                  
-                  <div className="space-y-3 text-left">
-                    <h4 className="font-semibold text-green-800">Next Steps:</h4>
-                    <ul className="text-sm text-green-700 space-y-2">
-                      <li>🥽 Put on your MetaQuest headset</li>
-                      <li>📱 Open the HoloDraft AR app</li>
-                      <li>🎯 Use hand gestures to interact with your model</li>
-                      <li>✏️ Edit, scale, and annotate in 3D space</li>
-                    </ul>
-                  </div>
+                  <p className="text-green-700 text-center">
+                    Your 3D model is now available on <strong>{selectedDevice.name}</strong>
+                  </p>
                 </div>
 
                 <div className="flex space-x-4 justify-center">

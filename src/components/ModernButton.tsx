@@ -4,12 +4,13 @@ import { motion } from 'framer-motion';
 interface ModernButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   disabled?: boolean;
   icon?: React.ReactNode;
   className?: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 const ModernButton: React.FC<ModernButtonProps> = ({
@@ -20,14 +21,16 @@ const ModernButton: React.FC<ModernButtonProps> = ({
   loading = false,
   disabled = false,
   icon,
-  className = ''
+  className = '',
+  type = 'button'
 }) => {
   const baseClasses = "relative overflow-hidden font-bold border-none cursor-pointer transition-all duration-300 ease-out transform-gpu";
   
   const variants = {
     primary: "bg-gradient-to-r from-green-500 to-green-600 text-black hover:from-green-400 hover:to-green-500 shadow-lg hover:shadow-green-500/25",
     secondary: "bg-zinc-900 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-black shadow-lg hover:shadow-green-500/25",
-    ghost: "bg-transparent text-green-500 hover:bg-green-500/10 border border-green-500/30 hover:border-green-500"
+    ghost: "bg-transparent text-green-500 hover:bg-green-500/10 border border-green-500/30 hover:border-green-500",
+    outline: "bg-transparent text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-black shadow-lg hover:shadow-green-500/25"
   };
   
   const sizes = {
@@ -38,6 +41,7 @@ const ModernButton: React.FC<ModernButtonProps> = ({
 
   return (
     <motion.button
+      type={type}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={onClick}
       disabled={disabled || loading}

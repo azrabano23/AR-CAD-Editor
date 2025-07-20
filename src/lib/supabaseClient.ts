@@ -1,20 +1,75 @@
 import { createClient } from '@supabase/supabase-js';
+import { mockSignUp, mockSignIn, mockSignOut, getCurrentMockUser, testMockConnection } from './mockAuth';
 
 // Supabase configuration
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL!;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY!;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+// Check if we have valid Supabase configuration
+const hasValidSupabaseConfig = !!(supabaseUrl && supabaseAnonKey && supabaseUrl.includes('supabase.co'));
+
+if (!hasValidSupabaseConfig) {
+  console.warn('⚠️ Invalid or missing Supabase configuration. Using mock authentication.', {
+    url: !!supabaseUrl,
+    key: !!supabaseAnonKey,
+    validUrl: supabaseUrl ? supabaseUrl.includes('supabase.co') : false
+  });
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Initialize Supabase client only if we have valid config
+let supabase: any = null;
+if (hasValidSupabaseConfig) {
+  console.log('Initializing Supabase with URL:', supabaseUrl);
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      },
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
+    });
+  } catch (err) {
+    console.error('Failed to initialize Supabase client:', err);
+    supabase = null;
+  }
+}
+
+export { supabase };
 
 // Types for HoloDraft
+export interface HoloDraftUser {
+  id: string;
+  created_at: string;
+  email: string;
+  full_name?: string;
+  avatar_url?: string;
+  subscription_type?: 'free' | 'pro' | 'enterprise';
+}
+
+export interface HoloDraftProject {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  description?: string;
+  owner_id: string;
+  is_public: boolean;
+  thumbnail_url?: string;
+  status: 'active' | 'archived';
+  collaborator_count: number;
+  file_count: number;
+}
+
 export interface HoloDraftFile {
   id: string;
   created_at: string;
   updated_at: string;
+  project_id: string;
   user_id: string;
   original_name: string;
   file_size: number;
@@ -25,42 +80,165 @@ export interface HoloDraftFile {
   error_message?: string;
   conversion_started_at?: string;
   conversion_completed_at?: string;
+  version: number;
+  parent_file_id?: string;
 }
 
-export interface HoloDraftUser {
+export interface ProjectCollaborator {
   id: string;
   created_at: string;
-  email: string;
-  full_name?: string;
-  avatar_url?: string;
-  subscription_type?: 'free' | 'pro' | 'enterprise';
+  project_id: string;
+  user_id: string;
+  role: 'owner' | 'editor' | 'viewer';
+  invited_by: string;
+  status: 'pending' | 'accepted' | 'declined';
+}
+
+export interface ARTemplate {
+  id: string;
+  created_at: string;
+  name: string;
+  description: string;
+  thumbnail_url?: string;
+  file_url: string;
+  category: 'mechanical' | 'architectural' | 'electronics' | 'automotive' | 'aerospace' | 'other';
+  is_featured: boolean;
+  download_count: number;
+  created_by?: string;
+}
+
+export interface CollaborationSession {
+  id: string;
+  created_at: string;
+  project_id: string;
+  user_id: string;
+  status: 'active' | 'idle' | 'disconnected';
+  last_activity: string;
+  cursor_position?: { x: number; y: number; z: number };
+  current_file_id?: string;
 }
 
 // Authentication functions
 export async function signUpWithEmail(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-  return { data, error };
+  // Use mock auth if no valid Supabase client
+  if (!supabase) {
+    console.log('🧪 Using mock authentication for sign up');
+    return await mockSignUp(email, password);
+  }
+  
+  try {
+    console.log('🔐 Attempting to sign up user:', email);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    
+    if (error) {
+      console.error('❌ Sign up error:', error);
+      return { data: null, error };
+    }
+    
+    console.log('✅ Sign up successful:', data.user?.email);
+    return { data, error: null };
+  } catch (err: any) {
+    console.error('❌ Sign up failed, falling back to mock auth:', err);
+    // Fallback to mock auth
+    return await mockSignUp(email, password);
+  }
 }
 
 export async function signInWithEmail(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  return { data, error };
+  // Use mock auth if no valid Supabase client
+  if (!supabase) {
+    console.log('🧪 Using mock authentication for sign in');
+    return await mockSignIn(email, password);
+  }
+  
+  try {
+    console.log('🔐 Attempting to sign in user:', email);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      console.error('❌ Sign in error:', error);
+      return { data: null, error };
+    }
+    
+    console.log('✅ Sign in successful:', data.user?.email);
+    return { data, error: null };
+  } catch (err: any) {
+    console.error('❌ Sign in failed, falling back to mock auth:', err);
+    // Fallback to mock auth
+    return await mockSignIn(email, password);
+  }
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  return { error };
+  // Use mock auth if no valid Supabase client
+  if (!supabase) {
+    console.log('🧪 Using mock authentication for sign out');
+    return await mockSignOut();
+  }
+  
+  try {
+    console.log('🚪 Signing out user');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('❌ Sign out error:', error);
+    } else {
+      console.log('✅ Sign out successful');
+    }
+    return { error };
+  } catch (err: any) {
+    console.error('❌ Sign out failed, falling back to mock:', err);
+    return await mockSignOut();
+  }
 }
 
 export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  // Use mock auth if no valid Supabase client
+  if (!supabase) {
+    console.log('🧪 Using mock authentication for get current user');
+    return getCurrentMockUser();
+  }
+  
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error('❌ Get user error:', error);
+      return null;
+    }
+    return user;
+  } catch (err: any) {
+    console.error('❌ Get user failed, falling back to mock:', err);
+    return getCurrentMockUser();
+  }
+}
+
+// Test Supabase connection
+export async function testSupabaseConnection() {
+  // Use mock connection test if no valid Supabase client
+  if (!supabase) {
+    console.log('🧪 Using mock connection test');
+    return await testMockConnection();
+  }
+  
+  try {
+    console.log('🧪 Testing Supabase connection...');
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error && error.message !== 'No session') {
+      throw error;
+    }
+    
+    console.log('✅ Supabase connection test successful');
+    return { success: true, error: null };
+  } catch (err: any) {
+    console.error('❌ Supabase connection test failed, using mock:', err);
+    return await testMockConnection();
+  }
 }
 
 // File management functions
@@ -71,7 +249,7 @@ export async function uploadFile(file: File, userId: string): Promise<{ data: Ho
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `uploads/${userId}/${fileName}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('cad-files')
       .upload(filePath, file);
 

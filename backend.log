@@ -1,0 +1,52 @@
+🚀 AR CAD Editor Backend running on port 3001
+📁 Upload directory: /Users/azrabano/ar-vr-visualization-of-data/backend/uploads
+🔄 Converted files directory: /Users/azrabano/ar-vr-visualization-of-data/backend/converted
+🐍 Scripts directory: /Users/azrabano/ar-vr-visualization-of-data/backend/scripts
+🔧 Starting conversion: /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752979456283-test_cube.obj -> /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752979456283-test_cube.fbx
+🔧 Using Blender: /Applications/Blender.app/Contents/MacOS/Blender
+🔄 Starting auto-conversion for: test_cube.obj
+🔧 Starting conversion: /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752979456283-test_cube.obj -> /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752979456283-test_cube.fbx
+🔧 Using Blender: /Applications/Blender.app/Contents/MacOS/Blender
+📝 Blender output: WARN (io.stl): source/blender/io/stl/importer/stl_import_mesh.cc:60 to_mesh: Removed 1 degenerate triangles during import
+📝 Blender output: WARN (io.stl): source/blender/io/stl/importer/stl_import_mesh.cc:60 to_mesh: Removed 1 degenerate triangles during import
+📝 Blender output: FBX export starting... '/Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752979456283-test_cube.fbx'
+export finished in 0.0039 sec.
+Successfully converted /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752979456283-test_cube.obj to /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752979456283-test_cube.fbx
+📝 Blender output: FBX export starting... '/Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752979456283-test_cube.fbx'
+export finished in 0.0040 sec.
+Successfully converted /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752979456283-test_cube.obj to /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752979456283-test_cube.fbx
+📝 Blender output: Blender 4.4.3 (hash 802179c51ccc built 2025-04-29 14:25:11)
+Timer 'STL Import' took 1.50 ms
+📝 Blender output: Blender 4.4.3 (hash 802179c51ccc built 2025-04-29 14:25:11)
+Timer 'STL Import' took 1.49 ms
+📝 Blender output: Blender quit
+📝 Blender output: Blender quit
+🏁 Blender process exited with code 0
+✅ Conversion successful
+✅ Auto-conversion successful for: test_cube.obj
+🎯 Converted file available at: /converted/1752979456283-test_cube.fbx
+🏁 Blender process exited with code 0
+✅ Conversion successful
+🔧 Starting conversion: /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752985193496-1751994960551-test_cube.stl -> /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752985193496-1751994960551-test_cube.fbx
+🔧 Using Blender: /Applications/Blender.app/Contents/MacOS/Blender
+🔄 Starting auto-conversion for: 1751994960551-test_cube.stl
+🔧 Starting conversion: /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752985193496-1751994960551-test_cube.stl -> /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752985193496-1751994960551-test_cube.fbx
+🔧 Using Blender: /Applications/Blender.app/Contents/MacOS/Blender
+📝 Blender output: FBX export starting... '/Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752985193496-1751994960551-test_cube.fbx'
+export finished in 0.0069 sec.
+Successfully converted /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752985193496-1751994960551-test_cube.stl to /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752985193496-1751994960551-test_cube.fbx
+📝 Blender output: FBX export starting... '/Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752985193496-1751994960551-test_cube.fbx'
+export finished in 0.0073 sec.
+Successfully converted /Users/azrabano/ar-vr-visualization-of-data/backend/uploads/1752985193496-1751994960551-test_cube.stl to /Users/azrabano/ar-vr-visualization-of-data/backend/converted/1752985193496-1751994960551-test_cube.fbx
+📝 Blender output: Blender 4.4.3 (hash 802179c51ccc built 2025-04-29 14:25:11)
+Timer 'STL Import' took 2.33 ms
+📝 Blender output: Blender 4.4.3 (hash 802179c51ccc built 2025-04-29 14:25:11)
+Timer 'STL Import' took 2.33 ms
+📝 Blender output: Blender quit
+📝 Blender output: Blender quit
+🏁 Blender process exited with code 0
+✅ Conversion successful
+✅ Auto-conversion successful for: 1751994960551-test_cube.stl
+🎯 Converted file available at: /converted/1752985193496-1751994960551-test_cube.fbx
+🏁 Blender process exited with code 0
+✅ Conversion successful
