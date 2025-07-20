@@ -59,11 +59,218 @@
 }
 
 .user-role {
-  font-size: 0.75rem;
-  color: #94a3b8;
+  font-size: 0.875rem;
+  color: #6b7280;
   text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* 3D Print Section Styles */
+.print-section {
+  width: 100%;
+  padding: 0;
+}
+
+.print-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.print-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.print-title h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.print-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.print-projects {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.print-info-panel {
+  position: sticky;
+  top: 2rem;
+}
+
+.info-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.info-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
+.info-card p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+  opacity: 0.9;
+}
+
+.info-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-card li {
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.selectable-projects h3 {
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: 0.025em;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+}
+
+.print-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.print-project-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.print-project-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.print-project-card .card-thumbnail {
+  height: 140px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.print-project-card .card-content {
+  padding: 1.25rem;
+}
+
+.print-project-card .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.print-project-card .card-header h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.print-project-card .card-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.print-project-card .card-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 1.25rem;
+}
+
+.print-project-card .card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.print-project-card .card-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.print-project-card .print-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .print-projects {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .print-info-panel {
+    position: static;
+  }
+  
+  .print-project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .print-title {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .print-title h2 {
+    font-size: 1.5rem;
+  }
+  
+  .info-card {
+    padding: 1.5rem;
+  }
+  
+  .print-project-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .header-right {

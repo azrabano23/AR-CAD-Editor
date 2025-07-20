@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Filter, Grid, List, FolderPlus, Box, Users, Clock, Download, Trash2, User } from 'lucide-react';
+import { Plus, Search, Filter, Grid, List, FolderPlus, Box, Users, Clock, Download, Trash2, User, Printer } from 'lucide-react';
 import { HoloDraftProject, HoloDraftUser, ARTemplate } from '../lib/supabaseClient';
 import ModernButton from './ModernButton';
 import UserProfile from './UserProfile';
+import PrintDialog from './PrintDialog';
 import './Dashboard.css';
 
 interface DashboardProps {
@@ -18,13 +19,15 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProject, onDeleteProject, onSignOut, onUpdateUser, onUseTemplate, onPreviewTemplate }) => {
-  const [activeTab, setActiveTab] = useState<'projects' | 'templates'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'templates' | 'print'>('projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [projects, setProjects] = useState<HoloDraftProject[]>([]);
   const [templates, setTemplates] = useState<ARTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const [selectedProjectForPrint, setSelectedProjectForPrint] = useState<HoloDraftProject | null>(null);
 
   // Projects start empty - users need to create their own
 
@@ -111,6 +114,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
     }
   };
 
+  const handlePrintProject = (project: HoloDraftProject) => {
+    setSelectedProjectForPrint(project);
+    setShowPrintDialog(true);
+  };
+
+  const handleClosePrintDialog = () => {
+    setShowPrintDialog(false);
+    setSelectedProjectForPrint(null);
+  };
+
   return (
     <div className="dashboard">
       {/* Header */}
@@ -181,6 +194,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
               >
                 <Box className="w-4 h-4" />
                 Try Our Templates ({templates.length})
+              </button>
+              <button 
+                className={`tab ${activeTab === 'print' ? 'active' : ''}`}
+                onClick={() => setActiveTab('print')}
+              >
+                <Printer className="w-4 h-4" />
+                3D Print
               </button>
             </div>
 
@@ -281,19 +301,29 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
                               <span className={`status-badge ${project.status}`}>{project.status}</span>
                             </div>
                           </div>
+                          <div className="card-actions">
+                            <ModernButton
+                              variant="secondary"
+                              size="sm"
+                              icon={<Printer className="w-4 h-4" />}
+                              onClick={() => handlePrintProject(project)}
+                            >
+                              3D Print
+                            </ModernButton>
+                          </div>
                         </motion.div>
                       ))}
-                    </div>
-                  )}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="templates"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
+                  </div>
+                )}
+              </motion.div>
+            ) : activeTab === 'templates' ? (
+              <motion.div
+                key="templates"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
                   <div className={`content-grid ${viewMode}`}>
                     {filteredTemplates.map((template) => (
                       <motion.div
@@ -348,7 +378,103 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
                     ))}
                   </div>
                 </motion.div>
-              )}
+            ) : (
+              <motion.div
+                key="print"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="print-section">
+                  <div className="print-header">
+                    <div className="print-title">
+                      <Printer className="w-6 h-6 text-blue-600" />
+                      <h2>3D Print Your Projects</h2>
+                    </div>
+                    <p className="print-subtitle">Select a project to send to your 3D printer</p>
+                  </div>
+
+                  {projects.length === 0 ? (
+                    <div className="empty-state">
+                      <Printer className="w-16 h-16 text-gray-300" />
+                      <h3>No projects to print</h3>
+                      <p>Create a project first to start 3D printing</p>
+                      <ModernButton 
+                        variant="primary" 
+                        size="lg"
+                        icon={<Plus className="w-5 h-5" />}
+                        onClick={onCreateProject}
+                      >
+                        Create Project
+                      </ModernButton>
+                    </div>
+                  ) : (
+                    <div className="print-projects">
+                      <div className="print-info-panel">
+                        <div className="info-card">
+                          <h3>🖨️ Ready to Print</h3>
+                          <p>Select any of your projects below to configure print settings and start printing.</p>
+                          <ul>
+                            <li>✓ Automatic printer discovery</li>
+                            <li>✓ Customizable print settings</li>
+                            <li>✓ Real-time print monitoring</li>
+                            <li>✓ Print history tracking</li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div className="selectable-projects">
+                        <h3>Choose a Project to Print</h3>
+                        <div className="print-project-grid">
+                          {projects.map((project) => (
+                            <motion.div
+                              key={project.id}
+                              layout
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              className="print-project-card"
+                            >
+                              <div className="card-thumbnail">
+                                {project.thumbnail_url ? (
+                                  <img src={project.thumbnail_url} alt={project.name} />
+                                ) : (
+                                  <div className="thumbnail-placeholder">
+                                    <FolderPlus className="w-8 h-8 text-gray-400" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="card-content">
+                                <div className="card-header">
+                                  <h4>{project.name}</h4>
+                                  <span className={`status-badge ${project.status}`}>{project.status}</span>
+                                </div>
+                                <p className="card-description">{project.description || 'No description available'}</p>
+                                <div className="card-meta">
+                                  <span><Clock className="w-3 h-3" /> Updated {formatDate(project.updated_at)}</span>
+                                  <span>📁 {project.file_count} files</span>
+                                </div>
+                              </div>
+                              <div className="card-actions">
+                                <ModernButton
+                                  variant="primary"
+                                  size="md"
+                                  icon={<Printer className="w-4 h-4" />}
+                                  onClick={() => handlePrintProject(project)}
+                                  className="print-btn"
+                                >
+                                  Print This Project
+                                </ModernButton>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
             </AnimatePresence>
           </div>
         </div>
@@ -364,6 +490,17 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
               onUpdateUser(updatedUser);
             }
           }}
+        />
+      )}
+
+      {/* 3D Print Dialog */}
+      {showPrintDialog && selectedProjectForPrint && (
+        <PrintDialog
+          isOpen={showPrintDialog}
+          onClose={handleClosePrintDialog}
+          projectId={selectedProjectForPrint.id}
+          projectName={selectedProjectForPrint.name}
+          userId={user.id}
         />
       )}
     </div>
