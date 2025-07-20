@@ -586,7 +586,7 @@ function App() {
             >
               Transform your CAD designs into immersive AR experiences in seconds. 
               Simply upload your 3D files and deploy instantly to MetaQuest headsets.
-              <br /><span className="highlight-text">Used by 2,000+ engineers worldwide</span>
+              <br /><span className="highlight-text">The future of CAD visualization</span>
             </motion.p>
             <motion.div 
               className="hero-actions"
