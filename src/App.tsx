@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Upload, ChevronLeft, ChevronRight, Zap, Sparkles, Layers } from 'lucide-react';
 import './App.css';
 import WebGLViewer from './components/WebGLViewer';
 import ARViewer from './components/ARViewer';
@@ -12,6 +12,7 @@ import AuthPage from './components/AuthPage';
 import Dashboard from './components/Dashboard';
 import ProjectSetup from './components/ProjectSetup';
 import ProjectWorkspace from './components/ProjectWorkspace';
+import AnimatedBackground from './components/AnimatedBackground';
 import { getCurrentUser, signOut, HoloDraftUser, HoloDraftProject } from './lib/supabaseClient';
 
 interface UploadedFile {
@@ -352,9 +353,23 @@ function App() {
     setCurrentView('setup');
   };
 
-  const handleUseTemplate = () => {
+  const handleUseTemplate = (templateId?: string) => {
+    // If templateId provided, we're using from dashboard, otherwise from landing
+    if (templateId) {
+      // TODO: Load template data and create project directly
+      console.log('Using template:', templateId);
+      // For now, just go to setup with template mode
+    }
     setSetupMode('template');
     setCurrentView('setup');
+  };
+  
+  const handlePreviewTemplate = (templateId: string, fileUrl: string) => {
+    console.log('Previewing template:', templateId, fileUrl);
+    // Show WebGL preview with the template file
+    setCurrentModelUrl(fileUrl);
+    setCurrentFileName(`Template: ${templateId}`);
+    setShowWebGLViewer(true);
   };
 
   const handleSetupComplete = (projectData: any) => {
@@ -378,6 +393,10 @@ function App() {
   const handleOpenProject = (project: HoloDraftProject) => {
     setCurrentProject(project);
     setCurrentView('project');
+  };
+
+  const handleUpdateUser = (updatedUser: HoloDraftUser) => {
+    setUser(updatedUser);
   };
 
   // Check authentication status on mount
@@ -417,7 +436,7 @@ function App() {
 
   // Show authentication page
   if (showAuth) {
-    return <AuthPage onAuthSuccess={handleAuthSuccess} />;
+    return <AuthPage onAuthSuccess={handleAuthSuccess} onClose={() => setShowAuth(false)} />;
   }
 
   // Show dashboard if user is authenticated
@@ -428,6 +447,9 @@ function App() {
         onCreateProject={handleCreateProject}
         onOpenProject={handleOpenProject}
         onSignOut={handleSignOut}
+        onUpdateUser={handleUpdateUser}
+        onUseTemplate={handleUseTemplate}
+        onPreviewTemplate={handlePreviewTemplate}
       />
     );
   }
@@ -479,12 +501,13 @@ function App() {
         )}
         
         {showARDeployment && (
-          <ARDeployment
-            isOpen={showARDeployment}
-            onClose={closeViewers}
-            modelUrl={currentModelUrl}
-            fileName={currentFileName}
-          />
+        <ARDeployment
+          isOpen={showARDeployment}
+          onClose={closeViewers}
+          modelUrl={currentModelUrl}
+          fileName={currentFileName}
+          userId={user.id}
+        />
         )}
       </>
     );
@@ -522,14 +545,49 @@ function App() {
 
       {/* Hero Section */}
       <header className="hero-section">
+        <AnimatedBackground />
         <div className="hero-container">
           <div className="hero-content">
-            <h1 className="hero-title">HoloDraft</h1>
-            <p className="hero-subtitle">CAD-to-AR Platform</p>
-            <p className="hero-description">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.2 }}
+            >
+              <div className="hero-badge">
+                <Sparkles className="w-4 h-4" />
+                <span>AI-Powered CAD to AR</span>
+                <Zap className="w-4 h-4" />
+              </div>
+            </motion.div>
+            
+            <motion.h1 
+              className="hero-title"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              Holo<span className="title-accent">Draft</span>
+            </motion.h1>
+            
+            <motion.p 
+              className="hero-subtitle"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              Next-Gen CAD-to-AR Platform
+            </motion.p>
+            
+            <motion.p 
+              className="hero-description"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+            >
               Transform your CAD designs into immersive AR experiences in seconds. 
               Simply upload your 3D files and deploy instantly to MetaQuest headsets.
-            </p>
+              <br /><span className="highlight-text">Used by 2,000+ engineers worldwide</span>
+            </motion.p>
             <motion.div 
               className="hero-actions"
               initial={{ opacity: 0, y: 30 }}
@@ -738,6 +796,117 @@ function App() {
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Workflow Section */}
+        <section className="workflow-section">
+          <div className="container">
+            <h2>How HoloDraft Works</h2>
+            <p className="section-subtitle">Simple 3-step process from CAD to AR</p>
+            <div className="workflow-steps">
+              <div className="workflow-step">
+                <div className="step-number">1</div>
+                <h3>Upload & Convert</h3>
+                <p>Upload your CAD files (STL, STEP, OBJ, PLY, DAE). Our platform automatically converts them to AR-optimized formats in real-time.</p>
+              </div>
+              <div className="workflow-arrow">→</div>
+              <div className="workflow-step">
+                <div className="step-number">2</div>
+                <h3>Preview & Optimize</h3>
+                <p>Use our WebGL viewer to preview your model, adjust settings, and ensure everything looks perfect before AR deployment.</p>
+              </div>
+              <div className="workflow-arrow">→</div>
+              <div className="workflow-step">
+                <div className="step-number">3</div>
+                <h3>Deploy to AR</h3>
+                <p>One-click deployment to your AR device. Share with team members and experience your designs in immersive 3D space.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tech Requirements Section */}
+        <section className="tech-requirements">
+          <div className="container">
+            <h2>Setup Requirements</h2>
+            <p className="section-subtitle">Everything you need to get started with AR deployment</p>
+            
+            <div className="requirements-grid">
+              <div className="requirement-card">
+                <div className="req-icon">🥽</div>
+                <h3>MetaQuest 2/3 Setup</h3>
+                <p>For deploying AR experiences to MetaQuest devices:</p>
+                <ol>
+                  <li><strong>Enable Developer Mode:</strong> Go to Meta Quest Mobile App → Settings → Developer Mode</li>
+                  <li><strong>Install SideQuest:</strong> Download from <a href="https://sidequestvr.com/setup-howto" target="_blank" rel="noopener noreferrer">sidequestvr.com</a></li>
+                  <li><strong>Alternative:</strong> Use <a href="https://developer.oculus.com/downloads/native-android/" target="_blank" rel="noopener noreferrer">Oculus Developer Hub</a></li>
+                  <li><strong>Connect Device:</strong> Enable USB debugging and connect via USB-C</li>
+                </ol>
+              </div>
+              
+              <div className="requirement-card">
+                <div className="req-icon">👓</div>
+                <h3>HoloLens Setup</h3>
+                <p>For deploying to Microsoft HoloLens devices:</p>
+                <ol>
+                  <li><strong>Enable Developer Mode:</strong> Settings → Update & Security → For developers</li>
+                  <li><strong>Device Portal:</strong> Enable and access via <a href="https://docs.microsoft.com/en-us/hololens/hololens-install-apps" target="_blank" rel="noopener noreferrer">Windows Device Portal</a></li>
+                  <li><strong>Visual Studio:</strong> Install <a href="https://visualstudio.microsoft.com/" target="_blank" rel="noopener noreferrer">Visual Studio 2022</a> with UWP tools</li>
+                  <li><strong>Network Connection:</strong> Ensure both devices are on same network</li>
+                </ol>
+              </div>
+              
+              <div className="requirement-card">
+                <div className="req-icon">📱</div>
+                <h3>Mobile AR (iOS/Android)</h3>
+                <p>For smartphone AR experiences:</p>
+                <ol>
+                  <li><strong>ARCore (Android):</strong> Ensure device supports ARCore</li>
+                  <li><strong>ARKit (iOS):</strong> iOS 11+ with A9 processor or newer</li>
+                  <li><strong>WebXR Support:</strong> Chrome 79+ or Safari with WebXR enabled</li>
+                  <li><strong>Camera Permissions:</strong> Allow camera access for AR tracking</li>
+                </ol>
+              </div>
+              
+              <div className="requirement-card">
+                <div className="req-icon">💻</div>
+                <h3>System Requirements</h3>
+                <p>Minimum specifications for HoloDraft platform:</p>
+                <ul>
+                  <li><strong>OS:</strong> Windows 10+, macOS 10.15+, or Ubuntu 18+</li>
+                  <li><strong>RAM:</strong> 8GB minimum, 16GB recommended</li>
+                  <li><strong>Graphics:</strong> DirectX 11 compatible GPU</li>
+                  <li><strong>Network:</strong> Stable internet connection</li>
+                  <li><strong>Browser:</strong> Chrome 90+, Firefox 88+, or Edge 90+</li>
+                </ul>
+              </div>
+              
+              <div className="requirement-card">
+                <div className="req-icon">🔧</div>
+                <h3>Development Tools</h3>
+                <p>Optional tools for advanced workflows:</p>
+                <ul>
+                  <li><strong>Unity 2021.3+:</strong> For custom AR app development</li>
+                  <li><strong>Blender 3.0+:</strong> For advanced 3D model editing</li>
+                  <li><strong>Git:</strong> For version control of AR projects</li>
+                  <li><strong>Android Studio:</strong> For Android AR development</li>
+                </ul>
+              </div>
+              
+              <div className="requirement-card">
+                <div className="req-icon">🌐</div>
+                <h3>Supported File Formats</h3>
+                <p>CAD and 3D file formats supported:</p>
+                <ul>
+                  <li><strong>CAD:</strong> STEP (.stp, .step), IGES (.igs)</li>
+                  <li><strong>Mesh:</strong> STL, OBJ, PLY, 3MF</li>
+                  <li><strong>Scene:</strong> DAE (Collada), glTF, FBX</li>
+                  <li><strong>Point Cloud:</strong> LAS, LAZ, XYZ</li>
+                  <li><strong>Max File Size:</strong> 50MB per file</li>
+                </ul>
               </div>
             </div>
           </div>

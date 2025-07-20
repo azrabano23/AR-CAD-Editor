@@ -1,0 +1,512 @@
+/* User Profile Overlay */
+.user-profile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.user-profile-modal {
+  background: #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #333;
+}
+
+/* Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid #333;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #9ca3af;
+}
+
+.back-btn:hover {
+  background-color: #374151;
+  color: #fff;
+}
+
+.header-info h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.header-info p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.subscription-badge {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Navigation Tabs */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid #333;
+  background: #262626;
+}
+
+.profile-tabs .tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #9ca3af;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+}
+
+.profile-tabs .tab:hover {
+  background-color: #374151;
+  color: #d1d5db;
+}
+
+.profile-tabs .tab.active {
+  color: #10b981;
+  border-bottom-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Content */
+.profile-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Profile Form */
+.profile-form .form-section {
+  margin-bottom: 32px;
+}
+
+.profile-form h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #d1d5db;
+  font-size: 14px;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #262626;
+  color: #ffffff;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-actions {
+  padding-top: 16px;
+  border-top: 1px solid #333;
+}
+
+/* Devices Section */
+.devices-section {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.section-header h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.section-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.free-limit-notice {
+  background: #fef3c7;
+  color: #d97706;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.empty-devices {
+  text-align: center;
+  padding: 48px 24px;
+  color: #6b7280;
+}
+
+.empty-devices h4 {
+  margin: 16px 0 8px;
+  font-size: 18px;
+  color: #374151;
+}
+
+.empty-devices p {
+  margin: 0 0 24px;
+}
+
+/* Device List */
+.devices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.device-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.device-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.device-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.device-details h4 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.device-details p {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.device-ip {
+  font-size: 12px;
+  color: #9ca3af;
+  font-family: monospace;
+}
+
+.device-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.device-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.test-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.test-btn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.test-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.remove-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+}
+
+/* Add Device Modal */
+.add-device-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.add-device-modal .modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 450px;
+  width: 90vw;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 2px solid #d1fae5;
+}
+
+.add-device-modal h4 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.add-device-modal p {
+  margin: 0 0 20px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.discovery-section h5 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.supported-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.device-type {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f0fdf4;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Subscription Section */
+.subscription-section .current-plan h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.plan-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.plan-info h4 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.plan-info p {
+  margin: 0 0 16px;
+  color: #6b7280;
+}
+
+.plan-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.limit-badge {
+  background: #fbbf24;
+  color: #92400e;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.upgrade-cta {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.upgrade-cta h4 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+}
+
+.upgrade-cta p {
+  margin: 0 0 20px;
+  opacity: 0.9;
+  color: white;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .user-profile-modal {
+    margin: 10px;
+    max-width: none;
+    max-height: calc(100vh - 20px);
+  }
+  
+  .profile-header {
+    padding: 16px;
+  }
+  
+  .profile-content {
+    padding: 16px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .device-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .device-status {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -22,8 +22,8 @@ import {
   Layers,
   Palette,
   Smartphone,
-  VrHeadset,
-  Cube,
+  Headphones,
+  Box,
   Send
 } from 'lucide-react';
 import ModernButton from './ModernButton';
@@ -403,7 +403,7 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
                     <ModernButton
                       variant="secondary"
                       size="sm"
-                      icon={<Cube className="w-4 h-4" />}
+                      icon={<Box className="w-4 h-4" />}
                       onClick={() => handlePreviewFile(selectedUploadFile)}
                     >
                       3D Preview
@@ -411,7 +411,7 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
                     <ModernButton
                       variant="primary"
                       size="sm"
-                      icon={<VrHeadset className="w-4 h-4" />}
+                      icon={<Headphones className="w-4 h-4" />}
                       onClick={() => handleDeployToAR(selectedUploadFile)}
                     >
                       Deploy to AR
@@ -422,7 +422,7 @@ const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ projectData, onBack
                 <div className="preview-viewport">
                   <div className="preview-placeholder">
                     <div className="preview-icon">
-                      <Cube className="w-16 h-16" />
+                      <Box className="w-16 h-16" />
                     </div>
                     <h4>{selectedUploadFile.file.name}</h4>
                     <p>Click "3D Preview" to view in WebGL or "Deploy to AR" for AR experience</p>

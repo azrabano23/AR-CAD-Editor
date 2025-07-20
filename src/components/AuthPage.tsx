@@ -6,9 +6,10 @@ import ModernButton from './ModernButton';
 
 interface AuthPageProps {
   onAuthSuccess: (user: any) => void;
+  onClose?: () => void;
 }
 
-const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
+const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess, onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -119,12 +120,38 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
                   <span className="stat-label">Error Detection</span>
                 </div>
               </div>
+
+              <div className="tech-requirements">
+                <h3>📱 Quick Setup Requirements</h3>
+                <div className="requirements-list">
+                  <div className="requirement">
+                    <strong>🥽 MetaQuest:</strong>
+                    <ul>
+                      <li>SideQuest or Developer Hub</li>
+                    </ul>
+                  </div>
+                  <div className="requirement">
+                    <strong>👓 HoloLens:</strong>
+                    <ul>
+                      <li>Device Portal & Visual Studio</li>
+                    </ul>
+                  </div>
+                </div>
+                <p className="requirements-note">
+                  💡 See full setup instructions on the main page.
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Right side - Auth form */}
         <div className="auth-form-container">
+          {onClose && (
+            <button className="auth-close-btn" onClick={onClose} title="Close">
+              ✕
+            </button>
+          )}
           <motion.div 
             className="auth-form"
             initial={{ opacity: 0, x: 20 }}

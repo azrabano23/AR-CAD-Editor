@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Filter, Grid, List, FolderPlus, Box, Users, Clock, Download, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, Grid, List, FolderPlus, Box, Users, Clock, Download, Trash2, User } from 'lucide-react';
 import { HoloDraftProject, HoloDraftUser, ARTemplate } from '../lib/supabaseClient';
 import ModernButton from './ModernButton';
+import UserProfile from './UserProfile';
 import './Dashboard.css';
 
 interface DashboardProps {
@@ -11,15 +12,19 @@ interface DashboardProps {
   onOpenProject: (project: HoloDraftProject) => void;
   onDeleteProject?: (projectId: string) => void;
   onSignOut: () => void;
+  onUpdateUser?: (updatedUser: HoloDraftUser) => void;
+  onUseTemplate?: (templateId: string) => void;
+  onPreviewTemplate?: (templateId: string, fileUrl: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProject, onDeleteProject, onSignOut }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProject, onDeleteProject, onSignOut, onUpdateUser, onUseTemplate, onPreviewTemplate }) => {
   const [activeTab, setActiveTab] = useState<'projects' | 'templates'>('projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [projects, setProjects] = useState<HoloDraftProject[]>([]);
   const [templates, setTemplates] = useState<ARTemplate[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   // Projects start empty - users need to create their own
 
@@ -143,6 +148,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
             >
               New Project
             </ModernButton>
+            <button 
+              onClick={() => setShowProfile(true)} 
+              className="profile-btn"
+              title="Profile & Settings"
+            >
+              <User className="w-4 h-4" />
+            </button>
             <button onClick={onSignOut} className="sign-out-btn">
               Sign Out
             </button>
@@ -316,10 +328,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
                             <span>By {template.created_by}</span>
                           </div>
                           <div className="card-actions">
-                            <ModernButton variant="secondary" size="sm">
+                            <ModernButton 
+                              variant="secondary" 
+                              size="sm"
+                              onClick={() => onPreviewTemplate && onPreviewTemplate(template.id, template.file_url)}
+                            >
                               Preview
                             </ModernButton>
-                            <ModernButton variant="primary" size="sm">
+                            <ModernButton 
+                              variant="primary" 
+                              size="sm"
+                              onClick={() => onUseTemplate && onUseTemplate(template.id)}
+                            >
                               Use Template
                             </ModernButton>
                           </div>
@@ -333,6 +353,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
           </div>
         </div>
       </div>
+      
+      {/* User Profile Modal */}
+      {showProfile && (
+        <UserProfile
+          user={user}
+          onClose={() => setShowProfile(false)}
+          onUpdateUser={(updatedUser) => {
+            if (onUpdateUser) {
+              onUpdateUser(updatedUser);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
