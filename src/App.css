@@ -1851,6 +1851,18 @@ button:hover {
   color: #0a0a0a;
 }
 
+.carousel-btn .btn-text {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: bold;
+  opacity: 0.3;
+}
+
+.carousel-btn svg {
+  position: relative;
+  z-index: 2;
+}
+
 .carousel-content {
   flex: 1;
   min-height: 240px;
@@ -1945,7 +1957,7 @@ button:hover {
 
 /* CTA Section */
 .cta-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   padding: 4rem 0;
   text-align: center;
   color: white;
@@ -1959,7 +1971,10 @@ button:hover {
 .cta-content p {
   font-size: 1.25rem;
   margin-bottom: 2rem;
-  opacity: 0.9;
+  opacity: 1;
+  color: white;
+  text-align: center;
+  max-width: none;
 }
 
 /* Loading and Auth States */

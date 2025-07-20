@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Upload, ArrowRight } from 'lucide-react';
-import { signInWithEmail, signUpWithEmail, testSupabaseConnection } from '../lib/supabaseClient';
+import { signInWithEmail, signUpWithEmail } from '../lib/supabaseClient';
 import ModernButton from './ModernButton';
 
 interface AuthPageProps {
@@ -17,7 +17,6 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [testingConnection, setTestingConnection] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,20 +58,6 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
     }
   };
 
-  const handleTestConnection = async () => {
-    setTestingConnection(true);
-    setError('');
-    
-    const result = await testSupabaseConnection();
-    
-    if (result.success) {
-      setError('✅ Supabase connection successful!');
-    } else {
-      setError(`❌ Connection failed: ${result.error}`);
-    }
-    
-    setTestingConnection(false);
-  };
 
   return (
     <div className="auth-page">
@@ -231,16 +216,6 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
                 {isSignUp ? 'Create Account' : 'Sign In'}
               </ModernButton>
               
-              <ModernButton
-                type="button"
-                variant="outline"
-                size="sm"
-                loading={testingConnection}
-                onClick={handleTestConnection}
-                className="test-connection"
-              >
-                {testingConnection ? '🧪 Testing...' : '🧪 Test Connection'}
-              </ModernButton>
             </form>
 
             <div className="form-footer">

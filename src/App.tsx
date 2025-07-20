@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import './App.css';
-import SupabaseTest from './components/SupabaseTest';
 import WebGLViewer from './components/WebGLViewer';
 import ARViewer from './components/ARViewer';
 import ARDeployment from './components/ARDeployment';
@@ -681,7 +680,7 @@ function App() {
         {/* ROI & Benefits - Fixed Carousel */}
         <section className="roi-section">
           <div className="container">
-            <h2>Return on Investment</h2>
+            <h2>Why Use HoloDraft</h2>
             <p className="section-subtitle">Real statistics from industry leaders</p>
             
             <div className="roi-carousel">
@@ -692,6 +691,7 @@ function App() {
                   aria-label="Previous slide"
                 >
                   <ChevronLeft size={20} />
+                  <span className="btn-text">‹</span>
                 </button>
                 
                 <div className="carousel-content">
@@ -725,6 +725,7 @@ function App() {
                   aria-label="Next slide"
                 >
                   <ChevronRight size={20} />
+                  <span className="btn-text">›</span>
                 </button>
               </div>
               
@@ -760,8 +761,6 @@ function App() {
         </section>
       </main>
       
-      {/* Supabase Connection Test */}
-      <SupabaseTest />
     </div>
   );
 }
