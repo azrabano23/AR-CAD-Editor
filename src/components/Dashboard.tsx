@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Filter, Grid, List, FolderPlus, Box, Users, Clock, Download, Trash2, User, Printer } from 'lucide-react';
+import { Plus, Search, Grid, List, FolderPlus, Box, Users, Clock, Download, Trash2, User, Printer } from 'lucide-react';
 import { HoloDraftProject, HoloDraftUser, ARTemplate } from '../lib/supabaseClient';
 import ModernButton from './ModernButton';
 import UserProfile from './UserProfile';
@@ -123,6 +123,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
     setShowPrintDialog(false);
     setSelectedProjectForPrint(null);
   };
+
 
   return (
     <div className="dashboard">
@@ -306,7 +307,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
                               variant="secondary"
                               size="sm"
                               icon={<Printer className="w-4 h-4" />}
-                              onClick={() => handlePrintProject(project)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePrintProject(project);
+                              }}
                             >
                               3D Print
                             </ModernButton>
@@ -503,6 +507,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onCreateProject, onOpenProj
           userId={user.id}
         />
       )}
+
     </div>
   );
 };

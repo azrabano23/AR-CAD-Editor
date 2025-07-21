@@ -7,7 +7,7 @@ interface FileData {
   name: string;
   size: number;
   type: string;
-  status: 'uploading' | 'uploaded' | 'converting' | 'converted' | 'error';
+  status: 'uploading' | 'processing' | 'ready' | 'error';
   originalFormat: string;
   convertedUrl?: string;
   errorMessage?: string;
@@ -15,16 +15,14 @@ interface FileData {
 
 interface ModernFileCardProps {
   file: FileData;
-  onConvert: () => void;
   onViewWebGL: () => void;
-  onViewAR: () => void;
+  onDeployAR: () => void;
 }
 
 const ModernFileCard: React.FC<ModernFileCardProps> = ({
   file,
-  onConvert,
   onViewWebGL,
-  onViewAR
+  onDeployAR
 }) => {
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -42,25 +40,17 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
           color: 'text-blue-500',
           bg: 'bg-blue-500/10',
           border: 'border-blue-500/30',
-          text: 'Uploading...'
+          text: 'Uploading & Converting...'
         };
-      case 'uploaded':
-        return {
-          icon: <CheckCircle className="w-6 h-6" />,
-          color: 'text-green-500',
-          bg: 'bg-green-500/10',
-          border: 'border-green-500/30',
-          text: 'Ready for conversion'
-        };
-      case 'converting':
+      case 'processing':
         return {
           icon: <Clock className="w-6 h-6 animate-pulse" />,
           color: 'text-yellow-500',
           bg: 'bg-yellow-500/10',
           border: 'border-yellow-500/30',
-          text: 'Converting to FBX...'
+          text: 'Processing for AR...'
         };
-      case 'converted':
+      case 'ready':
         return {
           icon: <CheckCircle className="w-6 h-6" />,
           color: 'text-green-500',
@@ -150,8 +140,8 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
           )}
         </div>
 
-        {/* Progress bar for converting */}
-        {file.status === 'converting' && (
+        {/* Progress bar for processing */}
+        {(file.status === 'processing' || file.status === 'uploading') && (
           <motion.div
             className="mb-4 w-full h-2 bg-zinc-800 rounded-full overflow-hidden"
             initial={{ opacity: 0, scaleX: 0 }}
@@ -159,7 +149,7 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
             transition={{ duration: 0.5 }}
           >
             <motion.div
-              className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full"
               animate={{ x: ['-100%', '100%'] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -168,19 +158,7 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
-          {file.status === 'uploaded' && (
-            <ModernButton
-              variant="secondary"
-              size="sm"
-              onClick={onConvert}
-              icon={<File className="w-4 h-4" />}
-              className="flex-1 min-w-0"
-            >
-              Convert to FBX
-            </ModernButton>
-          )}
-          
-          {file.status === 'converted' && (
+          {file.status === 'ready' && (
             <>
               <ModernButton
                 variant="ghost"
@@ -194,24 +172,13 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
               <ModernButton
                 variant="primary"
                 size="sm"
-                onClick={onViewAR}
+                onClick={onDeployAR}
                 icon={<Smartphone className="w-4 h-4" />}
                 className="flex-1 min-w-0"
               >
                 Deploy to AR
               </ModernButton>
             </>
-          )}
-          
-          {file.status === 'error' && (
-            <ModernButton
-              variant="secondary"
-              size="sm"
-              onClick={onConvert}
-              className="flex-1"
-            >
-              Retry
-            </ModernButton>
           )}
         </div>
       </div>

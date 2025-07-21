@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using Microsoft.MixedReality.Toolkit.Input;
+using HoloDraft.WebGL;
 
 namespace HoloDraft.CAD
 {
@@ -84,6 +85,24 @@ namespace HoloDraft.CAD
             
             // Initialize measurement system
             InitializeMeasurementSystem();
+            
+            // Initialize WebGL performance optimization
+            InitializeWebGLOptimization();
+        }
+        
+        private void InitializeWebGLOptimization()
+        {
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            // Ensure WebGL Performance Manager is active
+            if (WebGLPerformanceManager.Instance == null)
+            {
+                GameObject perfManager = new GameObject("WebGL_Performance_Manager");
+                perfManager.AddComponent<WebGLPerformanceManager>();
+                DontDestroyOnLoad(perfManager);
+            }
+            #endif
+            
+            Debug.Log("[CAD Manager] WebGL optimization initialized");
         }
         
         #region Model Loading and Management
@@ -155,7 +174,21 @@ namespace HoloDraft.CAD
             // Add interaction components
             AddInteractionComponents(modelObject);
             
+            // Register with WebGL Performance Manager for optimization
+            RegisterWithPerformanceManager(modelObject);
+            
             return cadModel;
+        }
+        
+        private void RegisterWithPerformanceManager(GameObject modelObject)
+        {
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            if (WebGLPerformanceManager.Instance != null)
+            {
+                WebGLPerformanceManager.Instance.RegisterObject(modelObject);
+                Debug.Log($"[CAD Manager] Registered {modelObject.name} with WebGL Performance Manager");
+            }
+            #endif
         }
         
         private void AddInteractionComponents(GameObject modelObject)
@@ -399,6 +432,14 @@ namespace HoloDraft.CAD
                 {
                     currentSelectedModel = null;
                 }
+                
+                // Unregister from WebGL Performance Manager
+                #if UNITY_WEBGL && !UNITY_EDITOR
+                if (WebGLPerformanceManager.Instance != null)
+                {
+                    WebGLPerformanceManager.Instance.UnregisterObject(model.gameObject);
+                }
+                #endif
                 
                 loadedModels.Remove(modelId);
                 OnModelDeleted?.Invoke(model);

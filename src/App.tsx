@@ -5,6 +5,8 @@ import './App.css';
 import WebGLViewer from './components/WebGLViewer';
 import ARViewer from './components/ARViewer';
 import ARDeployment from './components/ARDeployment';
+import MultiUserARSession from './components/MultiUserARSession';
+import MobileUploadAR from './components/MobileUploadAR';
 import ModernUploadZone from './components/ModernUploadZone';
 import ModernFileCard from './components/ModernFileCard';
 import ModernButton from './components/ModernButton';
@@ -19,7 +21,7 @@ interface UploadedFile {
   name: string;
   size: number;
   type: string;
-  status: 'uploading' | 'uploaded' | 'converting' | 'converted' | 'error';
+  status: 'uploading' | 'processing' | 'ready' | 'error';
   originalFormat: string;
   convertedUrl?: string;
   errorMessage?: string;
@@ -50,6 +52,8 @@ function App() {
   const [currentFileName, setCurrentFileName] = useState<string | undefined>(undefined);
   const [currentROISlide, setCurrentROISlide] = useState(0);
   const [selectedPlatform, setSelectedPlatform] = useState<'metaquest' | 'hololens' | 'mobile' | null>(null);
+  const [showMultiUserSession, setShowMultiUserSession] = useState(false);
+  const [showMobileUpload, setShowMobileUpload] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = ['stl', 'step', 'obj', 'ply', 'dae'];
@@ -187,7 +191,7 @@ function App() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:3001/api/upload', {
+      const response = await fetch('http://localhost:5000/api/upload', {
         method: 'POST',
         body: formData
       });
@@ -200,7 +204,7 @@ function App() {
       
       const updatedFile = {
         ...uploadedFile,
-        status: 'uploaded' as const,
+        status: 'processing' as const,
         id: result.file.id
       };
       
@@ -231,12 +235,10 @@ function App() {
       return;
     }
 
-    setFiles(prev => prev.map(f => 
-      f.name === file.name ? { ...f, status: 'converting' } : f
-    ));
+    // File is already in processing status from upload
 
     try {
-      const response = await fetch(`http://localhost:3001/api/convert/${file.id}`, {
+      const response = await fetch(`http://localhost:5000/api/convert/${file.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -252,7 +254,7 @@ function App() {
       setFiles(prev => prev.map(f => 
         f.name === file.name ? { 
           ...f, 
-          status: 'converted',
+          status: 'ready',
           convertedUrl: result.convertedUrl
         } : f
       ));
@@ -270,8 +272,8 @@ function App() {
     }
   };
 
-  const openARViewer = (file: UploadedFile) => {
-    if (file.status === 'converted' && file.convertedUrl) {
+  const deployToAR = (file: UploadedFile) => {
+    if (file.status === 'ready' && file.convertedUrl) {
       setCurrentModelUrl(file.convertedUrl);
       setCurrentFileName(file.name);
       setShowARDeployment(true);
@@ -279,7 +281,7 @@ function App() {
   };
 
   const openWebGLViewer = (file: UploadedFile) => {
-    if (file.status === 'converted' && file.convertedUrl) {
+    if (file.status === 'ready' && file.convertedUrl) {
       setCurrentModelUrl(file.convertedUrl);
       setCurrentFileName(file.name);
       setShowWebGLViewer(true);
@@ -316,10 +318,9 @@ const formatFileSize = (bytes: number) => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'uploading': return 'Uploading...';
-      case 'uploaded': return 'Ready for conversion';
-      case 'converting': return 'Converting to FBX...';
-      case 'converted': return 'Ready for AR';
+      case 'uploading': return 'Uploading & Converting...';
+      case 'processing': return 'Processing for AR...';
+      case 'ready': return 'Ready for AR';
       case 'error': return 'Error';
       default: return 'Unknown';
     }
@@ -1037,17 +1038,55 @@ const formatFileSize = (bytes: number) => {
             <div className="cta-content">
               <h2>Ready to Transform Your CAD Workflow?</h2>
               <p>Join thousands of engineers and designers already using HoloDraft</p>
-              <ModernButton 
-                variant="primary" 
-                size="lg"
-                onClick={() => setShowAuth(true)}
-              >
-                Start Free Trial
-              </ModernButton>
+              <div className="cta-actions">
+                <ModernButton 
+                  variant="primary" 
+                  size="lg"
+                  onClick={() => setShowAuth(true)}
+                >
+                  Start Free Trial
+                </ModernButton>
+                <ModernButton 
+                  variant="secondary" 
+                  size="lg"
+                  onClick={() => {
+                    setCurrentModelUrl('/demo-model.fbx');
+                    setShowMultiUserSession(true);
+                  }}
+                >
+                  🎬 View Multi-User Demo
+                </ModernButton>
+                <ModernButton 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => setShowMobileUpload(true)}
+                >
+                  📱 Try Mobile Upload
+                </ModernButton>
+              </div>
             </div>
           </div>
         </section>
       </main>
+      
+      {/* Multi-User AR Session Modal */}
+      {showMultiUserSession && (
+        <MultiUserARSession
+          modelUrl={currentModelUrl}
+          sessionId="demo-session"
+          onClose={() => {
+            setShowMultiUserSession(false);
+            setCurrentModelUrl(undefined);
+          }}
+        />
+      )}
+      
+      {/* Mobile Upload AR Modal */}
+      {showMobileUpload && (
+        <MobileUploadAR
+          onClose={() => setShowMobileUpload(false)}
+        />
+      )}
       
     </div>
   );
