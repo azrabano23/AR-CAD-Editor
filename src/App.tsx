@@ -49,6 +49,7 @@ function App() {
   const [currentModelUrl, setCurrentModelUrl] = useState<string | undefined>(undefined);
   const [currentFileName, setCurrentFileName] = useState<string | undefined>(undefined);
   const [currentROISlide, setCurrentROISlide] = useState(0);
+  const [selectedPlatform, setSelectedPlatform] = useState<'metaquest' | 'hololens' | 'mobile' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = ['stl', 'step', 'obj', 'ply', 'dae'];
@@ -293,7 +294,8 @@ function App() {
     setCurrentFileName(undefined);
   };
 
-  const formatFileSize = (bytes: number) => {
+
+const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -801,113 +803,230 @@ function App() {
           </div>
         </section>
 
-        {/* Workflow Section */}
+        {/* Workflow Section - Now a Carousel */}
         <section className="workflow-section">
           <div className="container">
             <h2>How HoloDraft Works</h2>
             <p className="section-subtitle">Simple 3-step process from CAD to AR</p>
-            <div className="workflow-steps">
-              <div className="workflow-step">
-                <div className="step-number">1</div>
-                <h3>Upload & Convert</h3>
-                <p>Upload your CAD files (STL, STEP, OBJ, PLY, DAE). Our platform automatically converts them to AR-optimized formats in real-time.</p>
+            
+            <div className="workflow-carousel">
+              <div className="carousel-wrapper">
+                <button 
+                  className="carousel-btn prev" 
+                  onClick={() => setCurrentROISlide(currentROISlide === 0 ? 2 : currentROISlide - 1)}
+                  aria-label="Previous step"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                
+                <div className="workflow-content">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentROISlide % 3}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -50 }}
+                      transition={{ duration: 0.3 }}
+                      className="workflow-slide"
+                    >
+                      {currentROISlide % 3 === 0 && (
+                        <div className="workflow-step">
+                          <div className="step-number">1</div>
+                          <h3>Upload & Convert</h3>
+                          <p>Upload your CAD files (STL, STEP, OBJ, PLY, DAE). Our platform automatically converts them to AR-optimized formats in real-time.</p>
+                          <div className="step-visual">
+                            <Upload size={48} className="step-icon" />
+                          </div>
+                        </div>
+                      )}
+                      {currentROISlide % 3 === 1 && (
+                        <div className="workflow-step">
+                          <div className="step-number">2</div>
+                          <h3>Preview & Optimize</h3>
+                          <p>Use our WebGL viewer to preview your model, adjust settings, and ensure everything looks perfect before AR deployment.</p>
+                          <div className="step-visual">
+                            <Layers size={48} className="step-icon" />
+                          </div>
+                        </div>
+                      )}
+                      {currentROISlide % 3 === 2 && (
+                        <div className="workflow-step">
+                          <div className="step-number">3</div>
+                          <h3>Deploy to AR</h3>
+                          <p>One-click deployment to your AR device. Share with team members and experience your designs in immersive 3D space.</p>
+                          <div className="step-visual">
+                            <Zap size={48} className="step-icon" />
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                
+                <button 
+                  className="carousel-btn next" 
+                  onClick={() => setCurrentROISlide((currentROISlide + 1) % 3)}
+                  aria-label="Next step"
+                >
+                  <ChevronRight size={20} />
+                </button>
               </div>
-              <div className="workflow-arrow">→</div>
-              <div className="workflow-step">
-                <div className="step-number">2</div>
-                <h3>Preview & Optimize</h3>
-                <p>Use our WebGL viewer to preview your model, adjust settings, and ensure everything looks perfect before AR deployment.</p>
-              </div>
-              <div className="workflow-arrow">→</div>
-              <div className="workflow-step">
-                <div className="step-number">3</div>
-                <h3>Deploy to AR</h3>
-                <p>One-click deployment to your AR device. Share with team members and experience your designs in immersive 3D space.</p>
+              
+              <div className="workflow-indicators">
+                {[0, 1, 2].map((index) => (
+                  <button
+                    key={index}
+                    className={`indicator ${(currentROISlide % 3) === index ? 'active' : ''}`}
+                    onClick={() => setCurrentROISlide(index)}
+                    aria-label={`Go to step ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Tech Requirements Section */}
+        {/* Tech Requirements Section as a Quiz */}
         <section className="tech-requirements">
           <div className="container">
             <h2>Setup Requirements</h2>
-            <p className="section-subtitle">Everything you need to get started with AR deployment</p>
+            <p className="section-subtitle">Choose your platform to get personalized setup instructions.</p>
             
-            <div className="requirements-grid">
-              <div className="requirement-card">
-                <div className="req-icon">🥽</div>
-                <h3>MetaQuest 2/3 Setup</h3>
-                <p>For deploying AR experiences to MetaQuest devices:</p>
-                <ol>
-                  <li><strong>Enable Developer Mode:</strong> Go to Meta Quest Mobile App → Settings → Developer Mode</li>
-                  <li><strong>Install SideQuest:</strong> Download from <a href="https://sidequestvr.com/setup-howto" target="_blank" rel="noopener noreferrer">sidequestvr.com</a></li>
-                  <li><strong>Alternative:</strong> Use <a href="https://developer.oculus.com/downloads/native-android/" target="_blank" rel="noopener noreferrer">Oculus Developer Hub</a></li>
-                  <li><strong>Connect Device:</strong> Enable USB debugging and connect via USB-C</li>
-                </ol>
+            <div className="setup-quiz">
+              <div className="quiz-options">
+                <motion.button 
+                  className={`quiz-option ${selectedPlatform === 'metaquest' ? 'selected' : ''}`}
+                  onClick={() => setSelectedPlatform('metaquest')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="option-icon">🥽</div>
+                  <h3>MetaQuest 2/3</h3>
+                  <p>VR headset setup</p>
+                </motion.button>
+                
+                <motion.button 
+                  className={`quiz-option ${selectedPlatform === 'hololens' ? 'selected' : ''}`}
+                  onClick={() => setSelectedPlatform('hololens')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="option-icon">👓</div>
+                  <h3>HoloLens</h3>
+                  <p>Mixed reality device</p>
+                </motion.button>
+                
+                <motion.button 
+                  className={`quiz-option ${selectedPlatform === 'mobile' ? 'selected' : ''}`}
+                  onClick={() => setSelectedPlatform('mobile')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="option-icon">📱</div>
+                  <h3>Mobile AR</h3>
+                  <p>iOS/Android devices</p>
+                </motion.button>
               </div>
               
-              <div className="requirement-card">
-                <div className="req-icon">👓</div>
-                <h3>HoloLens Setup</h3>
-                <p>For deploying to Microsoft HoloLens devices:</p>
-                <ol>
-                  <li><strong>Enable Developer Mode:</strong> Settings → Update & Security → For developers</li>
-                  <li><strong>Device Portal:</strong> Enable and access via <a href="https://docs.microsoft.com/en-us/hololens/hololens-install-apps" target="_blank" rel="noopener noreferrer">Windows Device Portal</a></li>
-                  <li><strong>Visual Studio:</strong> Install <a href="https://visualstudio.microsoft.com/" target="_blank" rel="noopener noreferrer">Visual Studio 2022</a> with UWP tools</li>
-                  <li><strong>Network Connection:</strong> Ensure both devices are on same network</li>
-                </ol>
-              </div>
-              
-              <div className="requirement-card">
-                <div className="req-icon">📱</div>
-                <h3>Mobile AR (iOS/Android)</h3>
-                <p>For smartphone AR experiences:</p>
-                <ol>
-                  <li><strong>ARCore (Android):</strong> Ensure device supports ARCore</li>
-                  <li><strong>ARKit (iOS):</strong> iOS 11+ with A9 processor or newer</li>
-                  <li><strong>WebXR Support:</strong> Chrome 79+ or Safari with WebXR enabled</li>
-                  <li><strong>Camera Permissions:</strong> Allow camera access for AR tracking</li>
-                </ol>
-              </div>
-              
-              <div className="requirement-card">
-                <div className="req-icon">💻</div>
-                <h3>System Requirements</h3>
-                <p>Minimum specifications for HoloDraft platform:</p>
-                <ul>
-                  <li><strong>OS:</strong> Windows 10+, macOS 10.15+, or Ubuntu 18+</li>
-                  <li><strong>RAM:</strong> 8GB minimum, 16GB recommended</li>
-                  <li><strong>Graphics:</strong> DirectX 11 compatible GPU</li>
-                  <li><strong>Network:</strong> Stable internet connection</li>
-                  <li><strong>Browser:</strong> Chrome 90+, Firefox 88+, or Edge 90+</li>
-                </ul>
-              </div>
-              
-              <div className="requirement-card">
-                <div className="req-icon">🔧</div>
-                <h3>Development Tools</h3>
-                <p>Optional tools for advanced workflows:</p>
-                <ul>
-                  <li><strong>Unity 2021.3+:</strong> For custom AR app development</li>
-                  <li><strong>Blender 3.0+:</strong> For advanced 3D model editing</li>
-                  <li><strong>Git:</strong> For version control of AR projects</li>
-                  <li><strong>Android Studio:</strong> For Android AR development</li>
-                </ul>
-              </div>
-              
-              <div className="requirement-card">
-                <div className="req-icon">🌐</div>
-                <h3>Supported File Formats</h3>
-                <p>CAD and 3D file formats supported:</p>
-                <ul>
-                  <li><strong>CAD:</strong> STEP (.stp, .step), IGES (.igs)</li>
-                  <li><strong>Mesh:</strong> STL, OBJ, PLY, 3MF</li>
-                  <li><strong>Scene:</strong> DAE (Collada), glTF, FBX</li>
-                  <li><strong>Point Cloud:</strong> LAS, LAZ, XYZ</li>
-                  <li><strong>Max File Size:</strong> 50MB per file</li>
-                </ul>
-              </div>
+              <AnimatePresence mode="wait">
+                {selectedPlatform && (
+                  <motion.div
+                    key={selectedPlatform}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="quiz-result"
+                  >
+                    {selectedPlatform === 'metaquest' && (
+                      <div className="platform-requirements">
+                        <h4>MetaQuest 2/3 Setup Requirements</h4>
+                        <div className="requirements-list">
+                          <div className="requirement">
+                            <span className="step-number">1</span>
+                            <div>
+                              <strong>Enable Developer Mode</strong>
+                              <p>Go to Meta Quest Mobile App → Settings → Developer Mode</p>
+                            </div>
+                          </div>
+                          <div className="requirement">
+                            <span className="step-number">2</span>
+                            <div>
+                              <strong>Install SideQuest</strong>
+                              <p>Download from <a href="https://sidequestvr.com/setup-howto" target="_blank" rel="noopener noreferrer">sidequestvr.com</a></p>
+                            </div>
+                          </div>
+                          <div className="requirement">
+                            <span className="step-number">3</span>
+                            <div>
+                              <strong>Connect Device</strong>
+                              <p>Enable USB debugging and connect via USB-C</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedPlatform === 'hololens' && (
+                      <div className="platform-requirements">
+                        <h4>HoloLens Setup Requirements</h4>
+                        <div className="requirements-list">
+                          <div className="requirement">
+                            <span className="step-number">1</span>
+                            <div>
+                              <strong>Enable Developer Mode</strong>
+                              <p>Settings → Update & Security → For developers</p>
+                            </div>
+                          </div>
+                          <div className="requirement">
+                            <span className="step-number">2</span>
+                            <div>
+                              <strong>Device Portal</strong>
+                              <p>Enable and access via <a href="https://docs.microsoft.com/en-us/hololens/hololens-install-apps" target="_blank" rel="noopener noreferrer">Windows Device Portal</a></p>
+                            </div>
+                          </div>
+                          <div className="requirement">
+                            <span className="step-number">3</span>
+                            <div>
+                              <strong>Visual Studio</strong>
+                              <p>Install <a href="https://visualstudio.microsoft.com/" target="_blank" rel="noopener noreferrer">Visual Studio 2022</a> with UWP tools</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedPlatform === 'mobile' && (
+                      <div className="platform-requirements">
+                        <h4>Mobile AR Setup Requirements</h4>
+                        <div className="requirements-list">
+                          <div className="requirement">
+                            <span className="step-number">1</span>
+                            <div>
+                              <strong>Compatible Device</strong>
+                              <p>ARCore (Android) or ARKit (iOS 11+ with A9 processor)</p>
+                            </div>
+                          </div>
+                          <div className="requirement">
+                            <span className="step-number">2</span>
+                            <div>
+                              <strong>WebXR Support</strong>
+                              <p>Chrome 79+ or Safari with WebXR enabled</p>
+                            </div>
+                          </div>
+                          <div className="requirement">
+                            <span className="step-number">3</span>
+                            <div>
+                              <strong>Camera Permissions</strong>
+                              <p>Allow camera access for AR tracking</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </section>

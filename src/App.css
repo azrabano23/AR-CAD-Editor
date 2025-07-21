@@ -198,8 +198,223 @@ button:hover {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: url('data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1000 100\' fill=\'%2310b981\' opacity=\'0.07\'><polygon points=\'1000,100 1000,0 0,100\'/></svg>') no-repeat bottom;
-  background-size: 100% 60px;
-  z-index: 0;
+}
+
+/* Workflow Carousel Styles */
+.workflow-carousel {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.workflow-content {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border-radius: 20px;
+  border: 1px solid #22c55e;
+  padding: 2rem;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.1);
+}
+
+.workflow-step {
+  text-align: center;
+  max-width: 600px;
+}
+
+.workflow-step .step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #0a0a0a;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.workflow-step h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #22c55e;
+}
+
+.workflow-step p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #a1a1aa;
+  margin: 0 auto 2rem;
+}
+
+.step-visual {
+  margin-top: 2rem;
+}
+
+.step-icon {
+  color: #22c55e;
+  opacity: 0.8;
+}
+
+.workflow-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.workflow-indicators .indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #333;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
+}
+
+.workflow-indicators .indicator.active {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  transform: scale(1.2);
+}
+
+/* Setup Requirements Quiz Styles */
+.setup-quiz {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.quiz-option {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 2px solid #333;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.quiz-option:hover {
+  border-color: #22c55e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+.quiz-option.selected {
+  border-color: #22c55e;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+}
+
+.option-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.quiz-option h3 {
+  color: #22c55e;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-option p {
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.quiz-result {
+  margin-top: 2rem;
+}
+
+.platform-requirements {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid #22c55e;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.1);
+}
+
+.platform-requirements h4 {
+  color: #22c55e;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.requirements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.requirement {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid #22c55e;
+}
+
+.requirement .step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #0a0a0a;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.requirement div {
+  flex: 1;
+}
+
+.requirement strong {
+  color: #22c55e;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.requirement p {
+  margin: 0;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
+.requirement a {
+  color: #22c55e;
+  text-decoration: underline;
+}
+
+.requirement a:hover {
+  color: #16a34a;
 }
 .hero-container {
   display: flex;
