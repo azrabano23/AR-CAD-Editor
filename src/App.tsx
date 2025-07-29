@@ -191,86 +191,49 @@ function App() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:5000/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const result = await response.json();
-      
-      const updatedFile = {
-        ...uploadedFile,
-        status: 'processing' as const,
-        id: result.file.id
-      };
-      
-      setFiles(prev => prev.map(f => 
-        f.name === uploadedFile.name ? updatedFile : f
-      ));
-      
-      console.log('✅ Upload successful:', result);
-      
-      // Automatically start conversion after successful upload
-      await convertToFBX(updatedFile);
-      
-    } catch (error) {
-      console.error('❌ Upload failed:', error);
+      // Update status to processing immediately
       setFiles(prev => prev.map(f => 
         f.name === uploadedFile.name ? { 
           ...f, 
-          status: 'error',
-          errorMessage: 'Upload failed. Please try again.'
+          status: 'processing' as const 
         } : f
       ));
-    }
-  };
 
-  const convertToFBX = async (file: UploadedFile) => {
-    if (!file.id) {
-      console.error('File ID is missing');
-      return;
-    }
-
-    // File is already in processing status from upload
-
-    try {
-      const response = await fetch(`http://localhost:5000/api/convert/${file.id}`, {
+      const response = await fetch('http://localhost:3001/convert', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        body: formData
       });
 
       if (!response.ok) {
         throw new Error('Conversion failed');
       }
 
-      const result = await response.json();
+      // The backend returns GLB data directly
+      const glbBlob = await response.blob();
+      const convertedUrl = URL.createObjectURL(glbBlob);
       
       setFiles(prev => prev.map(f => 
-        f.name === file.name ? { 
-          ...f, 
-          status: 'ready',
-          convertedUrl: result.convertedUrl
+        f.name === uploadedFile.name ? {
+          ...f,
+          status: 'ready' as const,
+          convertedUrl: convertedUrl
         } : f
       ));
-
-      console.log('✅ Conversion successful:', result);
+      
+      console.log('✅ Conversion successful');
+      
     } catch (error) {
-      console.error('❌ Conversion failed:', error);
+      console.error('❌ Upload and conversion failed:', error);
       setFiles(prev => prev.map(f => 
-        f.name === file.name ? { 
+        f.name === uploadedFile.name ? { 
           ...f, 
           status: 'error',
-          errorMessage: 'Conversion failed. Please try again.'
+          errorMessage: 'Upload and conversion failed. Please try again.'
         } : f
       ));
     }
   };
+
 
   const deployToAR = (file: UploadedFile) => {
     if (file.status === 'ready' && file.convertedUrl) {

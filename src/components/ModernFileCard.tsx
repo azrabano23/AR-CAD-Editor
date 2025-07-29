@@ -101,8 +101,8 @@ const ModernFileCard: React.FC<ModernFileCardProps> = ({
           <div className="flex items-center gap-3">
             <motion.div
               className={`${statusConfig.color}`}
-              animate={{ rotate: file.status === 'converting' ? 360 : 0 }}
-              transition={{ duration: 2, repeat: file.status === 'converting' ? Infinity : 0 }}
+              animate={{ rotate: file.status === 'processing' ? 360 : 0 }}
+              transition={{ duration: 2, repeat: file.status === 'processing' ? Infinity : 0 }}
             >
               {statusConfig.icon}
             </motion.div>

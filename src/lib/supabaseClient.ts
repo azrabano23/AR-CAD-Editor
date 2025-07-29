@@ -205,7 +205,15 @@ export async function getCurrentUser() {
   }
   
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    // Add timeout to prevent infinite loading
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Authentication timeout')), 5000)
+    );
+    
+    const authPromise = supabase.auth.getUser();
+    
+    const { data: { user }, error } = await Promise.race([authPromise, timeoutPromise]);
+    
     if (error) {
       console.error('❌ Get user error:', error);
       return null;
